@@ -42,22 +42,16 @@ And of course, the list goes on. Some known mods that do not work with BBE fully
 
 ## FAQ and Help
 **Q- What Minecraft versions will the mod be supporting?**                                       
-A- Minecraft versions from 1.21.6 and above
+A- Minecraft versions from 1.21.6 and above.
 
 **Q- Are backports planned?**                                                                              
-A- No backports are planned
-
-**Q- I don't see my sherds/pottery pattern on my Decorated Pot**                                                        
-A- We have yet to implement this into the mod, but support for this will come in a future update! If you want your pottery patterns to work, disable the decorated pot in the config screen.
+A- No backports are planned.
 
 **Q- My chests (or any other block entity) is invisible/glitched, what do I do?**                   
 A- You are most likely using a resource pack that conflicts with BBE, either disable the block entity optimizations through the config screen or turn off the resource pack.
 
 **Q- What other mods/dependencies do I need?**                                                                    
 A- For now, Fabric API and Sodium.
-
-**Q- Can I use any Sodium version with BBE?**                                                                 
-A- No, we always update BBE to use the latest stable Sodium version out for a Minecraft version. And that version has to be used when loading the mod.
 
 **Q- Are other mod loaders going to be supported?**                                                        
 A- Yes, a NeoForge variant is planned.
