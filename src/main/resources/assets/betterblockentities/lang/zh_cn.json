@@ -1,0 +1,43 @@
+{
+  "config.betterblockentities.title": "Better Block Entities 设置",
+  "config.betterblockentities.on": "§a开启",
+  "config.betterblockentities.off": "§c关闭",
+  "config.betterblockentities.value_format": "%s: %s",
+
+  "config.betterblockentities.enable_optimizations": "启用优化",
+  "config.betterblockentities.enable_optimizations.tooltip": "§7开启或关闭整个优化系统。",
+
+  "config.betterblockentities.optimize_chests": "优化箱子",
+  "config.betterblockentities.optimize_chests.tooltip": "§7开关所有箱子优化，此选项覆盖：§l§n箱子动画§r",
+  "config.betterblockentities.chest_animations": "箱子动画",
+
+  "config.betterblockentities.optimize_signs": "优化告示牌",
+  "config.betterblockentities.optimize_signs.tooltip": "§7开关所有告示牌优化，此选项覆盖：§l§n告示牌文本§r",
+  "config.betterblockentities.render_sign_text": "告示牌文本",
+
+  "config.betterblockentities.optimize_shulkers": "优化潜影盒",
+  "config.betterblockentities.optimize_shulkers.tooltip": "§7开关所有潜影盒优化，此选项覆盖：§l§n潜影盒动画§r",
+  "config.betterblockentities.shulker_animations": "潜影盒动画",
+
+  "config.betterblockentities.optimize_beds": "优化床",
+  "config.betterblockentities.optimize_beds.tooltip": "§7开关所有床的优化",
+
+  "config.betterblockentities.optimize_bells": "优化钟",
+  "config.betterblockentities.optimize_bells.tooltip": "§7开关所有钟优化，此选项覆盖：§l§n钟动画§r",
+  "config.betterblockentities.bell_animations": "钟动画",
+
+  "config.betterblockentities.optimize_decorated_pots": "优化饰纹陶罐",
+  "config.betterblockentities.optimize_decorated_pots.tooltip": "§7开关所有饰纹陶罐优化，此选项覆盖：§l§n饰纹陶罐动画§r",
+  "config.betterblockentities.pot_animations": "饰纹陶罐动画",
+
+  "config.betterblockentities.sign_text_render_distance": "告示牌文本渲染距离",
+  "config.betterblockentities.sign_text_render_distance.tooltip": "§7告示牌文本停止渲染的距离（方块数）",
+
+  "config.betterblockentities.update_type": "更新模式",
+  "config.betterblockentities.update_type.tooltip": "§7使用的更新调度器类型。§l§n智能(Smart)§r §7仅在方块实体不在视线内或视野外时更新。§l§n快速(Fast)§r §7立即更新。",
+  "config.betterblockentities.update_type.smart": "智能",
+  "config.betterblockentities.update_type.fast": "快速",
+
+  "config.betterblockentities.extra_render_passes": "额外渲染通道",
+  "config.betterblockentities.extra_render_passes.tooltip": "§7每个优化后的方块实体在停止动画后应进行的额外渲染通道数量，有助于消除视觉错误"
+}

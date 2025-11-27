@@ -36,7 +36,8 @@ public class ConfigScreen extends GameOptionsScreen {
     private SimpleOption<Integer> signDistance;
 
     public ConfigScreen(Screen parent) {
-        super(parent, MinecraftClient.getInstance().options, Text.translatable("Better Block Entities"));
+
+        super(parent, MinecraftClient.getInstance().options, Text.translatable("config.betterblockentities.title"));
         this.originalConfig = ConfigManager.CONFIG.copy();
     }
 
@@ -78,9 +79,9 @@ public class ConfigScreen extends GameOptionsScreen {
 
     private SimpleOption<Boolean> masterToggle() {
         return new SimpleOption<>(
-                "Enable Optimizations",
-                value -> Tooltip.of(Text.of("§7Turns the entire optimization system on or off.")),
-                (text, value) -> value ? Text.of("§aON") : Text.of("§cOFF"),
+                "config.betterblockentities.enable_optimizations",
+                value -> Tooltip.of(Text.translatable("config.betterblockentities.enable_optimizations.tooltip")),
+                (text, value) -> value ? Text.translatable("config.betterblockentities.on") : Text.translatable("config.betterblockentities.off"),
                 SimpleOption.BOOLEAN,
                 ConfigManager.CONFIG.master_optimize,
                 value -> {
@@ -92,9 +93,9 @@ public class ConfigScreen extends GameOptionsScreen {
 
     private SimpleOption<Boolean> optimizeChests() {
         return new SimpleOption<>(
-                "Optimize Chests",
-                value -> Tooltip.of(Text.of("§7Turns off all Chest optimizations, overrides the option: §l§nChest Animations§r")),
-                (text, value) -> value ? Text.of("§aON") : Text.of("§cOFF"),
+                "config.betterblockentities.optimize_chests",
+                value -> Tooltip.of(Text.translatable("config.betterblockentities.optimize_chests.tooltip")),
+                (text, value) -> value ? Text.translatable("config.betterblockentities.on") : Text.translatable("config.betterblockentities.off"),
                 SimpleOption.BOOLEAN,
                 ConfigManager.CONFIG.optimize_chests,
                 v -> {
@@ -106,7 +107,7 @@ public class ConfigScreen extends GameOptionsScreen {
 
     private SimpleOption<Boolean> chestsAnimations() {
         return booleanOption(
-                "Chest Animations",
+                "config.betterblockentities.chest_animations",
                 ConfigManager.CONFIG.chest_animations,
                 v -> ConfigManager.CONFIG.chest_animations = v
         );
@@ -114,9 +115,9 @@ public class ConfigScreen extends GameOptionsScreen {
 
     private SimpleOption<Boolean> optimizeSigns() {
         return new SimpleOption<>(
-                "Optimize Signs",
-                value -> Tooltip.of(Text.of("§7Turns off all Sign optimizations, overrides the option: §l§nSign Text§r")),
-                (text, value) -> value ? Text.of("§aON") : Text.of("§cOFF"),
+                "config.betterblockentities.optimize_signs",
+                value -> Tooltip.of(Text.translatable("config.betterblockentities.optimize_signs.tooltip")),
+                (text, value) -> value ? Text.translatable("config.betterblockentities.on") : Text.translatable("config.betterblockentities.off"),
                 SimpleOption.BOOLEAN,
                 ConfigManager.CONFIG.optimize_signs,
                 v -> {
@@ -128,7 +129,7 @@ public class ConfigScreen extends GameOptionsScreen {
 
     private SimpleOption<Boolean> renderSignText() {
         return booleanOption(
-                "Sign Text",
+                "config.betterblockentities.render_sign_text",
                 ConfigManager.CONFIG.render_sign_text,
                 v -> ConfigManager.CONFIG.render_sign_text = v
         );
@@ -136,9 +137,9 @@ public class ConfigScreen extends GameOptionsScreen {
 
     private SimpleOption<Boolean> optimizeShulkers() {
         return new SimpleOption<>(
-                "Optimize Shulkers",
-                value -> Tooltip.of(Text.of("§7Turns off all ShulkerBox optimizations, overrides the option: §l§nShulker Animations§r")),
-                (text, value) -> value ? Text.of("§aON") : Text.of("§cOFF"),
+                "config.betterblockentities.optimize_shulkers",
+                value -> Tooltip.of(Text.translatable("config.betterblockentities.optimize_shulkers.tooltip")),
+                (text, value) -> value ? Text.translatable("config.betterblockentities.on") : Text.translatable("config.betterblockentities.off"),
                 SimpleOption.BOOLEAN,
                 ConfigManager.CONFIG.optimize_shulkers,
                 v -> {
@@ -150,7 +151,7 @@ public class ConfigScreen extends GameOptionsScreen {
 
     private SimpleOption<Boolean> shulkerAnimations() {
         return booleanOption(
-                "Shulker Animations",
+                "config.betterblockentities.shulker_animations",
                 ConfigManager.CONFIG.shulker_animations,
                 v -> ConfigManager.CONFIG.shulker_animations = v
         );
@@ -158,9 +159,9 @@ public class ConfigScreen extends GameOptionsScreen {
 
     private SimpleOption<Boolean> optimizeBeds() {
         return new SimpleOption<>(
-                "Optimize Beds",
-                value -> Tooltip.of(Text.of("§7Turns off all Bed optimizations")),
-                (text, value) -> value ? Text.of("§aON") : Text.of("§cOFF"),
+                "config.betterblockentities.optimize_beds",
+                value -> Tooltip.of(Text.translatable("config.betterblockentities.optimize_beds.tooltip")),
+                (text, value) -> value ? Text.translatable("config.betterblockentities.on") : Text.translatable("config.betterblockentities.off"),
                 SimpleOption.BOOLEAN,
                 ConfigManager.CONFIG.optimize_beds,
                 v -> {
@@ -172,9 +173,9 @@ public class ConfigScreen extends GameOptionsScreen {
 
     private SimpleOption<Boolean> optimizeBells() {
         return new SimpleOption<>(
-                "Optimize Bells",
-                value -> Tooltip.of(Text.of("§7Turns off all Bell optimizations, overrides the option: §l§nBell Animations§r")),
-                (text, value) -> value ? Text.of("§aON") : Text.of("§cOFF"),
+                "config.betterblockentities.optimize_bells",
+                value -> Tooltip.of(Text.translatable("config.betterblockentities.optimize_bells.tooltip")),
+                (text, value) -> value ? Text.translatable("config.betterblockentities.on") : Text.translatable("config.betterblockentities.off"),
                 SimpleOption.BOOLEAN,
                 ConfigManager.CONFIG.optimize_bells,
                 v -> {
@@ -186,7 +187,7 @@ public class ConfigScreen extends GameOptionsScreen {
 
     private SimpleOption<Boolean> bellAnimations() {
         return booleanOption(
-                "Bell Animations",
+                "config.betterblockentities.bell_animations",
                 ConfigManager.CONFIG.bell_animations,
                 v -> ConfigManager.CONFIG.bell_animations = v
         );
@@ -194,9 +195,9 @@ public class ConfigScreen extends GameOptionsScreen {
 
     private SimpleOption<Boolean> optimizeDecoratedPots() {
         return new SimpleOption<>(
-                "Optimize Decorated Pots",
-                value -> Tooltip.of(Text.of("§7Turns off all Decorated Pot optimizations, overrides the option: §l§nDecorated Pot Animations§r")),
-                (text, value) -> value ? Text.of("§aON") : Text.of("§cOFF"),
+                "config.betterblockentities.optimize_decorated_pots",
+                value -> Tooltip.of(Text.translatable("config.betterblockentities.optimize_decorated_pots.tooltip")),
+                (text, value) -> value ? Text.translatable("config.betterblockentities.on") : Text.translatable("config.betterblockentities.off"),
                 SimpleOption.BOOLEAN,
                 ConfigManager.CONFIG.optimize_decoratedpots,
                 v -> {
@@ -208,7 +209,7 @@ public class ConfigScreen extends GameOptionsScreen {
 
     private SimpleOption<Boolean> potAnimations() {
         return booleanOption(
-                "Decorated Pot Animations",
+                "config.betterblockentities.pot_animations",
                 ConfigManager.CONFIG.pot_animations,
                 v -> ConfigManager.CONFIG.pot_animations = v
         );
@@ -216,9 +217,10 @@ public class ConfigScreen extends GameOptionsScreen {
 
     private SimpleOption<Integer> signTextRenderDistance() {
         return new SimpleOption<>(
-                "Sign Text Render Distance",
-                value -> Tooltip.of(Text.of("§7The amount of blocks the sign text will stop rendering at")),
-                (text, value) -> Text.of(text.getString() + ": " + value),
+                "config.betterblockentities.sign_text_render_distance",
+                value -> Tooltip.of(Text.translatable("config.betterblockentities.sign_text_render_distance.tooltip")),
+
+                (text, value) -> Text.translatable("config.betterblockentities.value_format", text, value),
                 new SimpleOption.ValidatingIntSliderCallbacks(0, 64),
                 ConfigManager.CONFIG.sign_text_render_distance,
                 v -> ConfigManager.CONFIG.sign_text_render_distance = v
@@ -227,12 +229,12 @@ public class ConfigScreen extends GameOptionsScreen {
 
     private SimpleOption<Integer> updateType() {
         return new SimpleOption<>(
-                "Update Type",
-                value -> Tooltip.of(Text.of("§7Type of update scheduler being used. §l§nSmart§r §7updates only when the BE is not in line of sight or out of FOV. §l§nFast§r §7updates immediately")),
+                "config.betterblockentities.update_type",
+                value -> Tooltip.of(Text.translatable("config.betterblockentities.update_type.tooltip")),
                 (text, value) -> switch (value) {
-                    case 0 -> Text.of("Smart");
-                    case 1 -> Text.of("Fast");
-                    default -> Text.of("Fast");
+                    case 0 -> Text.translatable("config.betterblockentities.update_type.smart");
+                    case 1 -> Text.translatable("config.betterblockentities.update_type.fast");
+                    default -> Text.translatable("config.betterblockentities.update_type.fast");
                 },
                 new SimpleOption.MaxSuppliableIntCallbacks(0, () -> 1, 1),
                 ConfigManager.CONFIG.updateType,
@@ -242,9 +244,10 @@ public class ConfigScreen extends GameOptionsScreen {
 
     private SimpleOption<Integer> extraRenderPasses() {
         return new SimpleOption<>(
-                "Extra Render Passes",
-                value -> Tooltip.of(Text.of("§7The amount of extra render passes each optimized block entity should be rendered for after it stops animating, can help smooth out visual bugs")),
-                (text, value) -> Text.of(text.getString() + ": " + value),
+                "config.betterblockentities.extra_render_passes",
+                value -> Tooltip.of(Text.translatable("config.betterblockentities.extra_render_passes.tooltip")),
+                // 使用通用格式 "标题: 数值"
+                (text, value) -> Text.translatable("config.betterblockentities.value_format", text, value),
                 new SimpleOption.ValidatingIntSliderCallbacks(0, 50),
                 ConfigManager.CONFIG.smoothness_slider,
                 v -> ConfigManager.CONFIG.smoothness_slider = v
@@ -255,7 +258,7 @@ public class ConfigScreen extends GameOptionsScreen {
         return new SimpleOption<>(
                 key,
                 SimpleOption.emptyTooltip(),
-                (text, value) -> value ? Text.of("§aON") : Text.of("§cOFF"),
+                (text, value) -> value ? Text.translatable("config.betterblockentities.on") : Text.translatable("config.betterblockentities.off"),
                 SimpleOption.BOOLEAN,
                 initial,
                 onChange

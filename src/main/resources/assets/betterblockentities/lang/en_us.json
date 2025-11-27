@@ -1,0 +1,43 @@
+{
+  "config.betterblockentities.title": "Better Block Entities",
+  "config.betterblockentities.on": "§aON",
+  "config.betterblockentities.off": "§cOFF",
+  "config.betterblockentities.value_format": "%s: %s",
+
+  "config.betterblockentities.enable_optimizations": "Enable Optimizations",
+  "config.betterblockentities.enable_optimizations.tooltip": "§7Turns the entire optimization system on or off.",
+
+  "config.betterblockentities.optimize_chests": "Optimize Chests",
+  "config.betterblockentities.optimize_chests.tooltip": "§7Turns off all Chest optimizations, overrides the option: §l§nChest Animations§r",
+  "config.betterblockentities.chest_animations": "Chest Animations",
+
+  "config.betterblockentities.optimize_signs": "Optimize Signs",
+  "config.betterblockentities.optimize_signs.tooltip": "§7Turns off all Sign optimizations, overrides the option: §l§nSign Text§r",
+  "config.betterblockentities.render_sign_text": "Sign Text",
+
+  "config.betterblockentities.optimize_shulkers": "Optimize Shulkers",
+  "config.betterblockentities.optimize_shulkers.tooltip": "§7Turns off all ShulkerBox optimizations, overrides the option: §l§nShulker Animations§r",
+  "config.betterblockentities.shulker_animations": "Shulker Animations",
+
+  "config.betterblockentities.optimize_beds": "Optimize Beds",
+  "config.betterblockentities.optimize_beds.tooltip": "§7Turns off all Bed optimizations",
+
+  "config.betterblockentities.optimize_bells": "Optimize Bells",
+  "config.betterblockentities.optimize_bells.tooltip": "§7Turns off all Bell optimizations, overrides the option: §l§nBell Animations§r",
+  "config.betterblockentities.bell_animations": "Bell Animations",
+
+  "config.betterblockentities.optimize_decorated_pots": "Optimize Decorated Pots",
+  "config.betterblockentities.optimize_decorated_pots.tooltip": "§7Turns off all Decorated Pot optimizations, overrides the option: §l§nDecorated Pot Animations§r",
+  "config.betterblockentities.pot_animations": "Decorated Pot Animations",
+
+  "config.betterblockentities.sign_text_render_distance": "Sign Text Render Distance",
+  "config.betterblockentities.sign_text_render_distance.tooltip": "§7The amount of blocks the sign text will stop rendering at",
+
+  "config.betterblockentities.update_type": "Update Type",
+  "config.betterblockentities.update_type.tooltip": "§7Type of update scheduler being used. §l§nSmart§r §7updates only when the BE is not in line of sight or out of FOV. §l§nFast§r §7updates immediately",
+  "config.betterblockentities.update_type.smart": "Smart",
+  "config.betterblockentities.update_type.fast": "Fast",
+
+  "config.betterblockentities.extra_render_passes": "Extra Render Passes",
+  "config.betterblockentities.extra_render_passes.tooltip": "§7The amount of extra render passes each optimized block entity should be rendered for after it stops animating, can help smooth out visual bugs"
+}
