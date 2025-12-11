@@ -8,14 +8,14 @@
   "elements": [
     {
       "from": [0, 0, 1],
-      "to": [15, 10, 15],
+      "to": [15, 10, 14.9999],
       "rotation": {"angle": 0, "axis": "y", "origin": [8, 8, 9]},
       "faces": {
         "north": {"uv": [10.75, 8.25, 14.5, 10.75], "rotation": 180, "texture": "#chest"},
         "east": {"uv": [0, 8.25, 3.5, 10.75], "rotation": 180, "texture": "#chest"},
         "south": {"uv": [3.5, 8.25, 7.25, 10.75], "rotation": 180, "texture": "#chest"},
         "up": {"uv": [11, 4.75, 7.25, 8.25], "texture": "#chest"},
-        "down": {"uv": [7.25, 4.75, 3.5, 8.25], "texture": "#chest", "cullface": "down"}
+        "down": {"uv": [7.25, 8.25, 3.5, 4.75], "texture": "#chest", "cullface": "down"}
       }
     }
   ]
