@@ -7,8 +7,8 @@
   },
   "elements": [
     {
-      "from": [1, 9, 1],
-      "to": [15, 14, 15],
+      "from": [0.9999, 9, 0.9999],
+      "to": [15.0001, 14, 15.0001],
       "rotation": {"angle": 0, "axis": "y", "origin": [9, 18, 9]},
       "faces": {
         "north": {"uv": [10.5, 3.5, 14, 4.75], "rotation": 180, "texture": "#chest"},
