@@ -63,9 +63,12 @@ public abstract class ChestBlockEntityRendererMixin
             this.doubleRightModel = this.BBEdoubleChestRight;
         }
     }
+    /* we override vanilla's date behavior */
     @Inject(method = "xmasTextures", at = @At("HEAD"), cancellable = true)
     private static void xmasTextures(CallbackInfoReturnable<Boolean> cir) {
-        if (ConfigManager.CONFIG.chest_christmas && ConfigManager.CONFIG.optimize_chests && ConfigManager.CONFIG.master_optimize)
-            cir.setReturnValue(true);
+        var christmas = ConfigManager.CONFIG.chest_christmas && ConfigManager.CONFIG.optimize_chests && ConfigManager.CONFIG.master_optimize;
+
+        cir.setReturnValue(christmas);
+        cir.cancel();
     }
 }
