@@ -1,0 +1,50 @@
+# Used when building external pull requests
+# We don't want to publish build artifacts or expose our other caches to possibly untrusted code
+name: build-pull-request
+
+on:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: Setup Gradle (read-only cache)
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: true
+
+      - name: Build
+        run: ./gradlew build
+
+      - name: Rename JAR for distribution
+        run: |
+          MAIN_JAR=$(ls build/libs/*.jar | grep -v 'sources' | head -n 1)
+          SOURCES_JAR=$(ls build/libs/*sources*.jar | head -n 1)
+          
+          VERSION=$(grep '^mod_version=' gradle.properties | cut -d'=' -f2)
+          MC_VERSION=$(grep '^minecraft_version=' gradle.properties | cut -d'=' -f2)
+          
+          BASE="bbe-${VERSION}+${MC_VERSION}-build.${{ github.run_number }}"
+          
+          mv "$MAIN_JAR" "build/libs/${BASE}.jar"
+          mv "$SOURCES_JAR" "build/libs/${BASE}-sources.jar"
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: bbe-artifacts-${{ github.run_number }}
+          path: build/libs/*.jar
