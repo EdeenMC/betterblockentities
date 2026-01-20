@@ -1,69 +1,55 @@
-# Better Block Entities
+## Better Block Entities
 
-BBE is a **client side** mod that drastically improves block entity rendering, and we aim to improve and regularly update the mod between Minecraft versions.
+BBE is a **client side** Minecraft mod for the <a href="https://fabricmc.net/use/">Fabric</a> mod loader which aims to increase block entity perfomance and enhancing their visuals, as well as providing support for block entity customisation.
 
-**Will I lose animations like FastChest and similar mods?**
-No you won’t, that’s the neat part. You get the **HUGE** performance increase without compromising animations! (If you want, you can turn this off if you don’t like it)
-On top of that, we also optimize more than only chests, like:
+**How does it work?** BBE makes some block entities use baked block models rather than laggy block entity models by implementing an hybrid renderer on Sodium's rendering pipeline. 
 
-- Shulker Boxes
-- Signs
-- Decorated Pots
-- Beds
-- Bells
-- Chests (ender, trapped, and all the new copper variants)
+**Is it just an optimization mod?** EBE *isn't* just an optimization mod, it has some benefits such as:
 
-**We are planning on adding even more block entities to that list in the future!**
+- Smooth lightning (or ambient occlusion) on block entities.
+- Toggling features like christmas chests.
+- Being able to see block entites from much further away, just like regular blocks.
 
-## How does the mod work?
+**What about animations? Do I lose animations like <a href="https://fabricmc.net/use/">FastChest</a> does?** No, additionally, the best part of BBE is that you still get to keep animations, and you can either enable them or disable them in the mod's settings! Most animated block entity models will only render with its usual block entity models when absolutely necessary.
 
-The mod works by rendering certain supported block entities conditionally in the regular terrain or in “meshes.” The mod switches between using Minecraft’s intended path of rendering for block entities when they are animating, and statically meshing them into the terrain when they are not. This improves FPS by a lot and scales depending on how many block entities you have. Expect at least a **3× increase!** We also offer options to turn off certain optimizations for each individual supported block through the mod menu options.
+## BBE 1.3.0-beta.1+ will work in <a href="https://modrinth.com/mod/sodium">Sodium</a> 0.8.0+ without additional dependencies.
 
-**Some added benefits :**
-- Being able to see these block entities from much further away (just like regular blocks)
-- Much nicer looking lighting / Ambient Occlusion (Smooth Lighting)
+**ONLY** for earlier BBE versions, use <a href="https://modrinth.com/mod/fabric-api">Fabric API</a> alongside Sodium 0.7.0 and below.
 
-## Mod Compatibility
-Currently, [Sodium](https://modrinth.com/mod/sodium) is a dependency, but we plan on making it optional in the future. [Fabric API](https://modrinth.com/mod/fabric-api) is needed as well.
+**Requires <a href="https://modrinth.com/mod/sodium">Sodium</a> for all versions of BBE, as BBE was made with Sodium, but in the future BBE will no longer require Sodium.**
 
-**Mod Support:** We aim to support as many mods as possible, but as many other developers know, it’s hard to support them all and incompatibilities will occur. If your mod does not work with BBE and you feel like it should, please reach out to us in our [Discord](https://discord.gg/NdX9BYpTtz) server.
-Out of the box we support nearly all your favorite optimization mods like:
+## FAQ and help
 
-- Sodium
-- Lithium
-- Nvidium
-- ImmediatelyFast
-- C2ME
+**Q- What Minecraft versions will the mod be supporting?**
 
-And of course, the list goes on. Some known mods that do not work with BBE fully enabled are Traben’s [EMF] [Entity Model Features](https://modrinth.com/mod/entity-model-features)  / [ETF] [Entity Texture Features](https://modrinth.com/mod/entitytexturefeatures) mods. If you want these to work alongside BBE, you will have to turn off optimizations for the block entity you want EMF/ETF to modify through our config screen. The same goes for resource packs that modify any of the enabled block entities, like add new parts or custom animations. All texture/resource packs that only touch block entity textures will work.
+**A-** Minecraft versions from 1.21.6 and above.
 
-## Before and Afters
-![Performance Test: ~29000 chests](https://cdn.modrinth.com/data/cached_images/3599c5d4f5b67bfd46c03ae471bd0ad1ed82dc88.png)
+**Q- Are backports planned?**
 
-## FAQ and Help
-**Q- What Minecraft versions will the mod be supporting?**                                       
-A- Minecraft versions from 1.21.6 and above
+**A-** No backports are planned.
 
-**Q- Are backports planned?**                                                                              
-A- No backports are planned
+**Q- What other mods/dependencies do I need?**
 
-**Q- I don't see my sherds/pottery pattern on my Decorated Pot**                                                        
-A- We have yet to implement this into the mod, but support for this will come in a future update! If you want your pottery patterns to work, disable the decorated pot in the config screen.
+**A-** For now, Fabric API and Sodium. Fabric API is no longer required since BBE 1.3.0-beta.1 and above.
 
-**Q- My chests (or any other block entity) is invisible/glitched, what do I do?**                   
-A- You are most likely using a resource pack that conflicts with BBE, either disable the block entity optimizations through the config screen or turn off the resource pack.
+**Q- Are other mod loaders going to be supported?**
 
-**Q- What other mods/dependencies do I need?**                                                                    
-A- For now, Fabric API and Sodium.
+**A-** Yes, a NeoForge variant is planned.
 
-**Q- Can I use any Sodium version with BBE?**                                                                 
-A- No, we always update BBE to use the latest stable Sodium version out for a Minecraft version. And that version has to be used when loading the mod.
+**Q- Is BBE compatible with resource packs and shaders?**
 
-**Q- Are other mod loaders going to be supported?**                                                        
-A- Yes, a NeoForge variant is planned.
+**A-** Yes, you can use resource packs and shaders without any problems, but keep in mind that ETF / EMF support is not 100% guaranteed and some resource packs might not work properly.
 
-**Q- Is BBE compatible with resource packs and shaders?**                                           
-A- Yes! You can load most resource packs and shaders with BBE no problem. Check the "Mod Compatibility" section above for some more info on resource packs and EMF/ETF.
+**Q- I need help with the mod/need to report a bug!**
 
+**A-** Please report an issue in the <a href="https://github.com/ceeden/betterblockentities/issues">GitHub repository</a> of the mod for incompatibilities or crashes with other mods when using BBE. We recommend to join our <a href="https://discord.gg/NdX9BYpTtz">Discord server</a> and ask for help out there.
 
+## FPS Boost
 
+![An image of a player comparing the optimizations of Vanilla and BBE with a lot of chests rendering in a superflat world.](https://cdn.modrinth.com/data/cached_images/3599c5d4f5b67bfd46c03ae471bd0ad1ed82dc88.png)
+
+## Compatibility
+
+BBE is compatible with mods such as Sodium, Lithium, C2ME, ImmediatelyFast, ModernFix, etc; meaning that you can have BBE's perfomance and visual benefits while playing with your favourite optimization mods.
+
+Since the release of <a href="https://modrinth.com/mod/better-block-entities/version/1.3.0-rc.1+1.21.11">BBE v1.3.0-rc.1+1.21.11</a>, BBE is compatible with <a href="https://modrinth.com/mod/entity-model-features">Entity Model Features</a> and <a href="https://modrinth.com/mod/entitytexturefeatures">Entity Texture Features</a>, but with limitations. Certain resource packs might cause to render out of place or being rotated weirdly. Not all resource packs that depend of these mods work with BBE and it's up to the resource pack creator to add compatibility with BBE's block model optimizations.
