@@ -10,6 +10,10 @@ base {
     archivesName.set(providers.gradleProperty("archives_base_name").orElse("bbe").get())
 }
 
+loom {
+    accessWidenerPath.set(file("src/main/resources/bbe.accesswidener"))
+}
+
 repositories {
     maven ( "https://maven.fabricmc.net/" )
 
