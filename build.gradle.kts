@@ -3,7 +3,10 @@ plugins {
     `maven-publish`
 }
 
-version = providers.gradleProperty( "mod_version" ).get()
+val modVersion = providers.gradleProperty( "mod_version" ).get()
+val mcVersion  = providers.gradleProperty( "minecraft_version" ).get()
+
+version = "$modVersion+$mcVersion"
 group   = providers.gradleProperty( "maven_group" ).get()
 
 base {
