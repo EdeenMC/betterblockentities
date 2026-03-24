@@ -74,11 +74,14 @@ public abstract class AbstractSignRendererMixin<S extends SignRenderState> imple
     private void renderCulledText(S state, CameraRenderState cameraRenderState, BlockState bs, SignBlock signBlock, PoseStack poseStack, SubmitNodeCollector collector) {
         if (!ConfigCache.signTextCulling) {
             poseStack.pushPose();
-            poseStack.mulPose(state.transformations.body());
-
+            poseStack.mulPose(state.transformations.frontText());
             this.submitSignText(state, poseStack, collector, state.frontText);
-            this.submitSignText(state, poseStack, collector, state.backText);
+            poseStack.popPose();
 
+
+            poseStack.pushPose();
+            poseStack.mulPose(state.transformations.backText());
+            this.submitSignText(state, poseStack, collector, state.backText);
             poseStack.popPose();
             return;
         }
@@ -113,13 +116,18 @@ public abstract class AbstractSignRendererMixin<S extends SignRenderState> imple
         /* if the visible side has no text, skip */
         if (!drawFront && !drawBack) return;
 
-        poseStack.pushPose();
-        poseStack.mulPose(state.transformations.body());
-
-        if (drawFront) this.submitSignText(state, poseStack, collector, state.frontText);
-        if (drawBack)  this.submitSignText(state, poseStack, collector, state.backText);
-
-        poseStack.popPose();
+        if (drawFront) {
+            poseStack.pushPose();
+            poseStack.mulPose(state.transformations.frontText());
+            this.submitSignText(state, poseStack, collector, state.frontText);
+            poseStack.popPose();
+        }
+        if (drawBack)  {
+            poseStack.pushPose();
+            poseStack.mulPose(state.transformations.backText());
+            this.submitSignText(state, poseStack, collector, state.backText);
+            poseStack.popPose();
+        }
     }
 
     @Unique

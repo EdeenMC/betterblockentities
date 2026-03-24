@@ -64,7 +64,7 @@ public abstract class BannerRendererMixin {
 
         BlockEntityRenderStateExt stateExt = (BlockEntityRenderStateExt)RENDER_STATE.get();
 
-        boolean managed = stateExt != null && OverlayRenderer.manageCrumblingOverlay(stateExt.blockEntity(), poseStack, model, state, light, overlayCoords, tint, crumblingOverlay);
+        boolean managed = stateExt != null && OverlayRenderer.manageCrumblingOverlay(stateExt.blockEntity(), poseStack, model, null, light, overlayCoords, tint, crumblingOverlay);
         if (!managed) {
             collector.submitModel(model, state, poseStack, light, overlayCoords, tint, spriteId, spriteGetter, i4, crumblingOverlay);
         }
