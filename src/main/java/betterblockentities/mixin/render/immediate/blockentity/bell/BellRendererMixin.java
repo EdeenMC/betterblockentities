@@ -13,6 +13,8 @@ import net.minecraft.client.renderer.blockentity.state.BellRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.sprite.SpriteGetter;
+import net.minecraft.client.resources.model.sprite.SpriteId;
 import net.minecraft.world.level.block.entity.BellBlockEntity;
 import net.minecraft.world.phys.Vec3;
 
@@ -35,10 +37,10 @@ public class BellRendererMixin {
         stateExt.blockEntity(bellBlockEntity);
     }
 
-    @Redirect(method = "submit(Lnet/minecraft/client/renderer/blockentity/state/BellRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/CameraRenderState;)V", at = @At(value = "INVOKE", target = "net/minecraft/client/renderer/SubmitNodeCollector.submitModel (Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/rendertype/RenderType;IIILnet/minecraft/client/renderer/texture/TextureAtlasSprite;ILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V"))
-    public <S> void manageSubmit(SubmitNodeCollector collector, Model<? super S> model, S state, PoseStack poseStack, RenderType renderType, int light, int overlayCoords, int tint, TextureAtlasSprite textureAtlasSprite, int i4, ModelFeatureRenderer.CrumblingOverlay crumblingOverlay, @Local(index = 1) BellRenderState bellRenderState) {
+    @Redirect(method = "submit(Lnet/minecraft/client/renderer/blockentity/state/BellRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V", at = @At(value = "INVOKE", target = "net/minecraft/client/renderer/SubmitNodeCollector.submitModel (Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lcom/mojang/blaze3d/vertex/PoseStack;IIILnet/minecraft/client/resources/model/sprite/SpriteId;Lnet/minecraft/client/resources/model/sprite/SpriteGetter;ILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V"))
+    public <S> void manageSubmit(SubmitNodeCollector collector, Model<S> model, S state, PoseStack poseStack, int light, int overlayCoords, int tint, SpriteId spriteId, SpriteGetter spriteGetter, int i4, ModelFeatureRenderer.CrumblingOverlay crumblingOverlay, @Local(index = 1) BellRenderState bellRenderState) {
         if (!ConfigCache.optimizeBells || !ConfigCache.masterOptimize) {
-            collector.submitModel(model, state, poseStack, renderType, light, overlayCoords, tint, textureAtlasSprite, i4, crumblingOverlay);
+            collector.submitModel(model, state, poseStack, light, overlayCoords, tint, spriteId, spriteGetter, i4, crumblingOverlay);
             return;
         }
 
@@ -46,7 +48,7 @@ public class BellRendererMixin {
 
         boolean managed = OverlayRenderer.manageCrumblingOverlay(stateExt.blockEntity(), poseStack, model, state, light, overlayCoords, tint, crumblingOverlay);
         if (!managed) {
-            collector.submitModel(model, state, poseStack, renderType, light, overlayCoords, tint, textureAtlasSprite, i4, crumblingOverlay);
+            collector.submitModel(model, state, poseStack, light, overlayCoords, tint, spriteId, spriteGetter, i4, crumblingOverlay);
         }
     }
 }

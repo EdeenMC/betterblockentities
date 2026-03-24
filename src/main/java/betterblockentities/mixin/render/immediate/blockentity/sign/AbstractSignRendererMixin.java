@@ -5,16 +5,19 @@ import betterblockentities.client.gui.config.ConfigCache;
 import betterblockentities.client.render.immediate.OverlayRenderer;
 
 /* minecraft */
+import betterblockentities.mixin.render.immediate.BlockEntityRenderStateAccessor;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.AbstractSignRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.state.SignRenderState;
-import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Unit;
 import net.minecraft.world.level.block.SignBlock;
+import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.entity.SignText;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.WoodType;
@@ -32,35 +35,31 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(AbstractSignRenderer.class)
-public abstract class AbstractSignRendererMixin {
-    @Shadow protected abstract void translateSign(PoseStack matrices, float blockRotationDegrees, BlockState state);
-    @Shadow protected abstract void submitSignText(SignRenderState renderState, PoseStack matrices, SubmitNodeCollector queue, boolean front);
-    @Shadow protected abstract Model.Simple getSignModel(BlockState blockState, WoodType woodType);
-    @Shadow protected abstract float getSignModelRenderScale();
+public abstract class AbstractSignRendererMixin<S extends SignRenderState> implements BlockEntityRenderer<SignBlockEntity, S> {
+    @Shadow protected abstract void submitSignText(S state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, SignText signText);
+    @Shadow protected abstract Model.Simple getSignModel(S state);
 
-    @Inject(method = "submit(Lnet/minecraft/client/renderer/blockentity/state/SignRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/CameraRenderState;)V", at = @At("HEAD"), cancellable = true)
-    public void manageSubmit(SignRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState, CallbackInfo ci) {
+    @Inject(method = "submit(Lnet/minecraft/client/renderer/blockentity/state/SignRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V", at = @At("HEAD"), cancellable = true)
+    public void manageSubmit(S state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState, CallbackInfo ci) {
         if (!ConfigCache.masterOptimize || !ConfigCache.optimizeSigns) return;
 
         ci.cancel();
 
-        final BlockState bs = state.blockState;
+        final BlockState bs = ((BlockEntityRenderStateAccessor)state).getBlockState();
         final SignBlock signBlock = (SignBlock)bs.getBlock();
 
-        manageCrumblingOverlay(state, bs, signBlock, poseStack);
+        manageCrumblingOverlay(state, poseStack);
         renderCulledText(state, cameraRenderState, bs, signBlock, poseStack, submitNodeCollector);
     }
 
     @Unique
-    private void manageCrumblingOverlay(SignRenderState state, BlockState bs, SignBlock signBlock, PoseStack poseStack) {
+    private void manageCrumblingOverlay(S state, PoseStack poseStack) {
         if (state.breakProgress == null) return;
 
-        final Model.Simple model = this.getSignModel(bs, signBlock.type());
-        final float s = this.getSignModelRenderScale();
+        final Model.Simple model = this.getSignModel(state);
 
         poseStack.pushPose();
-        this.translateSign(poseStack, -signBlock.getYRotationDegrees(bs), bs);
-        poseStack.scale(s, -s, -s);
+        poseStack.mulPose(state.transformations.body());
 
         OverlayRenderer.submitCrumblingOverlay(
                 poseStack, model, Unit.INSTANCE,
@@ -72,13 +71,13 @@ public abstract class AbstractSignRendererMixin {
     }
 
     @Unique
-    private void renderCulledText(SignRenderState state, CameraRenderState cameraRenderState, BlockState bs, SignBlock signBlock, PoseStack poseStack, SubmitNodeCollector collector) {
+    private void renderCulledText(S state, CameraRenderState cameraRenderState, BlockState bs, SignBlock signBlock, PoseStack poseStack, SubmitNodeCollector collector) {
         if (!ConfigCache.signTextCulling) {
             poseStack.pushPose();
-            this.translateSign(poseStack, -((SignBlock)bs.getBlock()).getYRotationDegrees(bs), bs);
+            poseStack.mulPose(state.transformations.body());
 
-            this.submitSignText(state, poseStack, collector, true);
-            this.submitSignText(state, poseStack, collector, false);
+            this.submitSignText(state, poseStack, collector, state.frontText);
+            this.submitSignText(state, poseStack, collector, state.backText);
 
             poseStack.popPose();
             return;
@@ -115,10 +114,10 @@ public abstract class AbstractSignRendererMixin {
         if (!drawFront && !drawBack) return;
 
         poseStack.pushPose();
-        this.translateSign(poseStack, -signBlock.getYRotationDegrees(bs), bs);
+        poseStack.mulPose(state.transformations.body());
 
-        if (drawFront) this.submitSignText(state, poseStack, collector, true);
-        if (drawBack)  this.submitSignText(state, poseStack, collector, false);
+        if (drawFront) this.submitSignText(state, poseStack, collector, state.frontText);
+        if (drawBack)  this.submitSignText(state, poseStack, collector, state.backText);
 
         poseStack.popPose();
     }

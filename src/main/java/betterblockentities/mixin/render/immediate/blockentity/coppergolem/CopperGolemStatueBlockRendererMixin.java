@@ -12,6 +12,10 @@ import net.minecraft.client.renderer.blockentity.CopperGolemStatueBlockRenderer;
 import net.minecraft.client.renderer.blockentity.state.CopperGolemStatueRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.Unit;
+import net.minecraft.world.entity.animal.golem.CopperGolemOxidationLevels;
 import net.minecraft.world.level.block.entity.CopperGolemStatueBlockEntity;
 import net.minecraft.world.phys.Vec3;
 
@@ -34,10 +38,10 @@ public class CopperGolemStatueBlockRendererMixin {
         stateExt.blockEntity(copperGolemStatueBlockEntity);
     }
 
-    @Redirect(method = "submit(Lnet/minecraft/client/renderer/blockentity/state/CopperGolemStatueRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/CameraRenderState;)V", at = @At(value = "INVOKE", target = "net/minecraft/client/renderer/SubmitNodeCollector.submitModel (Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/rendertype/RenderType;IIILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V"))
-    public <S> void manageSubmit(SubmitNodeCollector collector, Model<? super S> model, S state, PoseStack poseStack, RenderType renderType, int light, int overlayCoords, int tint, ModelFeatureRenderer.CrumblingOverlay crumblingOverlay, @Local(index = 1)CopperGolemStatueRenderState copperGolemStatueRenderState) {
+    @Redirect(method = "submit(Lnet/minecraft/client/renderer/blockentity/state/CopperGolemStatueRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V", at = @At(value = "INVOKE", target = "net/minecraft/client/renderer/SubmitNodeCollector.submitModel (Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/resources/Identifier;IIILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V"))
+    public <S> void manageSubmit(SubmitNodeCollector collector, Model<S> model, S state, PoseStack poseStack, Identifier texture, int light, int overlayCoords, int tint, ModelFeatureRenderer.CrumblingOverlay crumblingOverlay, @Local(index = 1)CopperGolemStatueRenderState copperGolemStatueRenderState) {
         if (!ConfigCache.optimizeCopperGolemStatue || !ConfigCache.masterOptimize) {
-            collector.submitModel(model, state, poseStack, renderType, light, overlayCoords, tint, crumblingOverlay);
+            collector.submitModel(model, state, poseStack, texture, light, overlayCoords, tint, crumblingOverlay);
             return;
         }
 
@@ -45,7 +49,7 @@ public class CopperGolemStatueBlockRendererMixin {
 
         boolean managed = OverlayRenderer.manageCrumblingOverlay(stateExt.blockEntity(), poseStack, model, state, light, overlayCoords, tint, crumblingOverlay);
         if (!managed) {
-            collector.submitModel(model, state, poseStack, renderType, light, overlayCoords, tint, crumblingOverlay);
+            collector.submitModel(model, state, poseStack, texture, light, overlayCoords, tint, crumblingOverlay);
         }
     }
 }

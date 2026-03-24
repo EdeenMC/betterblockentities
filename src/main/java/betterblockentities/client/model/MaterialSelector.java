@@ -1,21 +1,15 @@
 package betterblockentities.client.model;
 
 /* minecraft */
-import com.google.common.collect.ImmutableList;
-import net.minecraft.client.renderer.MaterialMapper;
 import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.SpriteMapper;
 import net.minecraft.client.renderer.blockentity.state.ChestRenderState;
-import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.sprite.SpriteId;
 import net.minecraft.core.Holder;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.CopperChestBlock;
 import net.minecraft.world.level.block.entity.*;
-import net.minecraft.world.level.block.state.properties.WoodType;
-import org.jspecify.annotations.Nullable;
 
 /* java/misc */
 import java.util.*;
@@ -28,17 +22,17 @@ import java.util.stream.Collectors;
  * to avoid invoking these from each renderer or risking concurrency (not thread-safe)
  */
 public class MaterialSelector {
-    private static final ConcurrentHashMap<Identifier, Material> BANNER_MATERIALS = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Identifier, SpriteId> BANNER_MATERIALS = new ConcurrentHashMap<>();
 
-    public static Material getBannerMaterial(Holder<BannerPattern> holder) {
+    public static SpriteId getBannerMaterial(Holder<BannerPattern> holder) {
         Identifier id = holder.value().assetId();
-        MaterialMapper mapper = Sheets.BANNER_MAPPER;
+        SpriteMapper mapper = Sheets.BANNER_MAPPER;
         return BANNER_MATERIALS.computeIfAbsent(id, mapper::apply);
     }
 
-    public static Material getDPSideMaterial(Optional<Item> optional) {
+    public static SpriteId getDPSideMaterial(Optional<Item> optional) {
         if (optional.isPresent()) {
-            Material material = Sheets.getDecoratedPotMaterial(DecoratedPotPatterns.getPatternFromItem((Item)optional.get()));
+            SpriteId material = Sheets.getDecoratedPotSprite(DecoratedPotPatterns.getPatternFromItem((Item)optional.get()));
             if (material != null) {
                 return material;
             }

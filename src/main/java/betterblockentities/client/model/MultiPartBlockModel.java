@@ -7,14 +7,19 @@ import betterblockentities.mixin.model.modelpart.ModelPartAccessor;
 
 /* minecraft */
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.renderer.block.model.*;
-import net.minecraft.client.renderer.block.model.multipart.MultiPartModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.renderer.block.dispatch.SingleVariant;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.QuadCollection;
+import net.minecraft.client.resources.model.SimpleModelWrapper;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.geometry.QuadCollection;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.util.RandomSource;
 
 /* mojang */
 import com.mojang.blaze3d.vertex.PoseStack;
+import org.jspecify.annotations.NonNull;
 
 /* java/misc */
 import java.util.ArrayList;
@@ -22,17 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * A wrapper for {@link net.minecraft.client.renderer.block.model.multipart.MultiPartModel}
- * This implementation assembles a "MultiPart" type BlockStateModel from either a list of
- * BlockModelPart(s) or runs some extra logic for block models which use the Model pipeline
- * inorder to convert the underlying render data to a list of BakedQuad(s) which we then wrap
- * in SimpleModelWrapper{BlockModelPart} and SingleVariant{BlockStateModel} There is also
- * additional render data added to this implementation to easily sort out each BlockStateModel
- * from the tree with the generated {@link #pairs} list. The pairs list will only be populated
- * if {@link #MultiPartBlockModel(ModelPart, TextureAtlasSprite, PoseStack)} constructor is called
- * and each key is derived from each Model Root child key
- */
+
 public class MultiPartBlockModel implements BlockStateModel {
     private final List<BlockStateModel> models = new ArrayList<>();
     private final Map<String, BlockStateModel> pairs = new HashMap<>();
@@ -41,7 +36,7 @@ public class MultiPartBlockModel implements BlockStateModel {
         generateMeshModel(root, sprite, stack);
     }
 
-    public MultiPartBlockModel(List<BlockModelPart> parts) {
+    public MultiPartBlockModel(List<BlockStateModelPart> parts) {
         constructSingleVariants(parts);
     }
 
@@ -85,8 +80,8 @@ public class MultiPartBlockModel implements BlockStateModel {
         return builder.build();
     }
 
-    private void constructSingleVariants(List<BlockModelPart> parts) {
-        for (BlockModelPart variant : parts) {
+    private void constructSingleVariants(List<BlockStateModelPart> parts) {
+        for (BlockStateModelPart variant : parts) {
             models.add(new SingleVariant(variant));
         }
     }
@@ -100,7 +95,7 @@ public class MultiPartBlockModel implements BlockStateModel {
     }
 
     @Override
-    public void collectParts(RandomSource randomSource, List<BlockModelPart> list) {
+    public void collectParts(@NonNull RandomSource randomSource, @NonNull List<BlockStateModelPart> list) {
         if (models.isEmpty()) return;
 
         long seed = randomSource.nextLong();
@@ -112,7 +107,12 @@ public class MultiPartBlockModel implements BlockStateModel {
     }
 
     @Override
-    public TextureAtlasSprite particleIcon() {
+    public Material.Baked particleMaterial() {
         return null;
+    }
+
+    @Override
+    public @BakedQuad.MaterialFlags int materialFlags() {
+        return 0;
     }
 }

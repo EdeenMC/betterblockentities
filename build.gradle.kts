@@ -1,5 +1,5 @@
 plugins {
-    id( "fabric-loom" )
+    id( "net.fabricmc.fabric-loom" )
     `maven-publish`
 }
 
@@ -10,29 +10,22 @@ base {
     archivesName.set(providers.gradleProperty("archives_base_name").orElse("bbe").get())
 }
 
-loom {
-    accessWidenerPath.set(file("src/main/resources/bbe.accesswidener"))
-}
-
 repositories {
     maven ( "https://maven.fabricmc.net/" )
 
     maven ( "https://maven.caffeinemc.net/releases" )
     maven ( "https://maven.caffeinemc.net/snapshots" )
 
-    maven ( "https://maven.terraformersmc.com/" )
-    maven ( "https://api.modrinth.com/maven/" )
-
     mavenCentral()
 }
 
 dependencies {
     minecraft ( "com.mojang:minecraft:${providers.gradleProperty("minecraft_version").get()}" )
-    mappings  ( loom.officialMojangMappings() )
 
-    modImplementation ( "net.fabricmc:fabric-loader:${providers.gradleProperty("loader_version").get()}" )
-    modImplementation ( "net.caffeinemc:sodium-fabric:${providers.gradleProperty("sodium_version").get()}" )
+    compileOnly ( "net.fabricmc:fabric-loader:${providers.gradleProperty("loader_version").get()}" )
+    compileOnly ( "net.fabricmc.fabric-api:fabric-api:${providers.gradleProperty("fabric_api_version").get()}" )
 
+    implementation ( "net.caffeinemc:sodium-fabric:${providers.gradleProperty("sodium_version").get()}" )
 }
 
 tasks.processResources {

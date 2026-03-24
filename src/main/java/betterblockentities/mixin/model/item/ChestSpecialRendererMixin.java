@@ -4,11 +4,10 @@ package betterblockentities.mixin.model.item;
 import betterblockentities.client.gui.config.ConfigCache;
 
 /* minecraft */
+import net.minecraft.client.renderer.MultiblockChestResources;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.special.ChestSpecialRenderer;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.Material;
-import net.minecraft.client.resources.model.MaterialSet;
+import net.minecraft.client.resources.model.sprite.SpriteGetter;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.SpecialDates;
 
@@ -21,22 +20,28 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(ChestSpecialRenderer.class)
 public class ChestSpecialRendererMixin {
-    @Shadow @Final public static Identifier GIFT_CHEST_TEXTURE;
-    @Shadow @Final private MaterialSet materials;
+    @Shadow @Final private SpriteGetter sprites;
+    @Shadow @Final public static MultiblockChestResources<Identifier> CHRISTMAS;
 
-    @ModifyArg(method = "submit", at = @At(value = "INVOKE", target = "net/minecraft/client/renderer/SubmitNodeCollector.submitModel(Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/rendertype/RenderType;IIILnet/minecraft/client/renderer/texture/TextureAtlasSprite;ILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V"), index = 7)
-    public TextureAtlasSprite submit(TextureAtlasSprite original) {
-        Identifier orgContentsName = original.contents().name();
+    /**
+     * This will have to be rewritten to account for the spriteId and map that with spriteGetter
+     * As for mixin semantics @ModifyArg is no longer possible here
+     */
+    /*
+    @ModifyArg(method = "submit", at = @At(value = "INVOKE", target = "net/minecraft/client/renderer/SubmitNodeCollector.submitModel (Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lcom/mojang/blaze3d/vertex/PoseStack;IIILnet/minecraft/client/resources/model/sprite/SpriteId;Lnet/minecraft/client/resources/model/sprite/SpriteGetter;ILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V"), index = 7)
+    public SpriteGetter submit(SpriteGetter original) {
+        Identifier orgContentsName = original.
         String path = orgContentsName.getPath();
 
         if (path.contains("normal") || path.contains("trapped")) {
             if (SpecialDates.isExtendedChristmas())
                 return original;
             else if (ConfigCache.masterOptimize && ConfigCache.optimizeChests && ConfigCache.christmasChests) {
-                Material material = Sheets.CHEST_MAPPER.apply(GIFT_CHEST_TEXTURE);
+                Material material = Sheets.CHEST_MAPPER.apply();
                 return this.materials.get(material);
             }
         }
         return original;
     }
+     */
 }

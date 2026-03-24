@@ -10,7 +10,8 @@ import betterblockentities.client.render.immediate.blockentity.SpecialBlockEntit
 
 /* minecraft */
 import net.minecraft.client.Camera;
-import net.minecraft.client.renderer.state.LevelRenderState;
+import net.minecraft.client.renderer.state.level.LevelRenderState;
+import net.minecraft.server.level.BlockDestructionProgress;
 import net.minecraft.world.level.block.entity.*;
 
 /* mojang */
@@ -34,7 +35,7 @@ import java.util.SortedSet;
 @Mixin(SodiumWorldRenderer.class)
 public abstract class SodiumWorldRendererMixin {
     @Inject(method = "extractBlockEntity", at = @At("HEAD"), cancellable = true)
-    private void extractBlockEntity(BlockEntity blockEntity, PoseStack poseStack, Camera camera, float tickDelta, Long2ObjectMap<SortedSet<?>> progression, LevelRenderState levelRenderState, CallbackInfo ci) {
+    private void extractBlockEntity(BlockEntity blockEntity, PoseStack poseStack, Camera camera, float tickDelta, Long2ObjectMap<SortedSet<BlockDestructionProgress>> progression, LevelRenderState levelRenderState, CallbackInfo ci) {
         if (!ConfigCache.masterOptimize) return;
 
         BlockEntityExt ext = (BlockEntityExt) blockEntity;

@@ -5,8 +5,7 @@ import net.minecraft.client.model.Model;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BannerRenderer;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.resources.model.Material;
-import net.minecraft.client.resources.model.MaterialSet;
+import net.minecraft.client.resources.model.sprite.SpriteGetter;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.entity.BannerPatternLayers;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,10 +15,17 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 public interface BannerRendererAccessor {
     @Invoker("submitPatterns")
     static <S> void invokeSubmitPatterns(
-            MaterialSet materialSet, PoseStack poseStack, SubmitNodeCollector collector,
-            int i, int j, Model<S> model, S state, Material material, boolean bl,
-            DyeColor dyeColor, BannerPatternLayers layers, boolean bl2,
-            ModelFeatureRenderer.CrumblingOverlay overlay, int k
+            SpriteGetter sprites,
+            PoseStack poseStack,
+            SubmitNodeCollector submitNodeCollector,
+            int lightCoords,
+            int overlayCoords,
+            Model<S> model,
+            S state,
+            boolean banner,
+            DyeColor baseColor,
+            BannerPatternLayers patterns,
+            ModelFeatureRenderer.CrumblingOverlay breakProgress
     ) {
         throw new AssertionError();
     }

@@ -9,7 +9,7 @@ import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.Sheets;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.blockentity.HangingSignRenderer;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
@@ -96,9 +96,9 @@ public class GeometryRegistry {
             WALL_BANNER_FLAG = ModelLayers.WALL_BANNER_FLAG;
             SIGN_WALL = ModelLayers.createWallSignModelName(WoodType.OAK);
             SIGN_STANDING = ModelLayers.createStandingSignModelName(WoodType.OAK);
-            HANGING_SIGN_WALL = ModelLayers.createHangingSignModelName(WoodType.OAK, HangingSignRenderer.AttachmentType.WALL);
-            HANGING_SIGN_CEILING = ModelLayers.createHangingSignModelName(WoodType.OAK, HangingSignRenderer.AttachmentType.CEILING);
-            HANGING_SIGN_CEILING_MIDDLE = ModelLayers.createHangingSignModelName(WoodType.OAK, HangingSignRenderer.AttachmentType.CEILING_MIDDLE);
+            HANGING_SIGN_WALL = ModelLayers.createHangingSignModelName(WoodType.OAK, HangingSignBlock.Attachment.WALL);
+            HANGING_SIGN_CEILING = ModelLayers.createHangingSignModelName(WoodType.OAK, HangingSignBlock.Attachment.CEILING);
+            HANGING_SIGN_CEILING_MIDDLE = ModelLayers.createHangingSignModelName(WoodType.OAK, HangingSignBlock.Attachment.CEILING_MIDDLE);
             COPPER_GOLEM = ModelLayers.COPPER_GOLEM;
             COPPER_GOLEM_RUNNING = ModelLayers.COPPER_GOLEM_RUNNING;
             COPPER_GOLEM_SITTING = ModelLayers.COPPER_GOLEM_SITTING;
@@ -136,8 +136,8 @@ public class GeometryRegistry {
             BED_HEAD = Identifier.withDefaultNamespace("entity/bed/bed_head");
             BED_FOOT = Identifier.withDefaultNamespace("entity/bed/bed_foot");
             BANNER = Identifier.withDefaultNamespace("entity/banner_base");
-            SIGN = Sheets.getSignMaterial(WoodType.OAK).texture();
-            HANGING_SIGN = Sheets.getHangingSignMaterial(WoodType.OAK).texture();
+            SIGN = Sheets.getSignSprite(WoodType.OAK).texture();
+            HANGING_SIGN = Sheets.getHangingSignSprite(WoodType.OAK).texture();
             COPPER_GOLEM_STATUE =  Identifier.withDefaultNamespace("entity/copper_golem/copper_golem");
 
             ALL = new Identifier[]{CHEST, BELL_BODY, DECORATED_POT_BASE, DECORATED_POT_SIDES, SHULKER, BED_HEAD,

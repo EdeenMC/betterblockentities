@@ -1,11 +1,11 @@
 package betterblockentities.mixin.sodium.pipeline;
 
 /* minecraft */
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 
 /* sodium */
@@ -31,12 +31,6 @@ public interface AbstractBlockRenderContextAccessor {
     @Accessor("random")
     RandomSource getRandom();
 
-    @Accessor("defaultRenderType")
-    ChunkSectionLayer getDefaultRenderType();
-
-    @Accessor("defaultRenderType")
-    void setDefaultRenderType(@Nullable ChunkSectionLayer layer);
-
     @Accessor("state")
     BlockState getState();
     @Accessor("state")
@@ -46,11 +40,6 @@ public interface AbstractBlockRenderContextAccessor {
     BlockPos getPos();
     @Accessor("pos")
     void setPos(BlockPos pos);
-
-    @Accessor("allowDowngrade")
-    boolean getAllowDowngrade();
-    @Accessor("allowDowngrade")
-    void setAllowDowngrade(boolean allow);
 
     @Accessor("slice")
     LevelSlice getSlice();

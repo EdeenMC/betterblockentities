@@ -5,11 +5,11 @@ import betterblockentities.client.chunk.util.QuadTransform;
 import betterblockentities.mixin.sodium.pipeline.AbstractBlockRenderContextAccessor;
 
 /* minecraft */
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.BlockModelPart;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.sprite.SpriteId;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.BlockState;
@@ -36,7 +36,7 @@ import java.util.function.Predicate;
  */
 public class BlockRenderHelper {
     private final BlockRenderer ctx;
-    private Material material;
+    private SpriteId material;
     private ChunkSectionLayer rendertype;
     private float[] rotation;
     private int color = -1;
@@ -46,7 +46,7 @@ public class BlockRenderHelper {
         this.ctx = ctx;
     }
 
-    public void setMaterial(Material material) {
+    public void setMaterial(SpriteId material) {
         this.material = material;
     }
 
@@ -71,9 +71,9 @@ public class BlockRenderHelper {
      * Rebuild of DefaultModelEmitter->emitModel
      * see {@link net.caffeinemc.mods.sodium.client.services.DefaultModelEmitter#emitModel}
      */
-    public static void emitModelPart(List<BlockModelPart> parts, MutableQuadViewImpl quad, BlockState state, Predicate<@Nullable Direction> cullTest, PlatformModelEmitter.Bufferer defaultBuffer) {
+    public static void emitModelPart(List<BlockStateModelPart> parts, MutableQuadViewImpl quad, BlockState state, Predicate<@Nullable Direction> cullTest, PlatformModelEmitter.Bufferer defaultBuffer) {
         for(int i = 0; i < parts.size(); ++i) {
-            BlockModelPart part = (BlockModelPart)parts.get(i);
+            BlockStateModelPart part = (BlockStateModelPart)parts.get(i);
             defaultBuffer.emit(part, cullTest, MutableQuadViewImpl::emitDirectly);
         }
     }
@@ -84,7 +84,7 @@ public class BlockRenderHelper {
      * render data should be done in {@link betterblockentities.client.chunk.pipeline.BBEEmitter} and passed
      * through the setters in this class
      */
-    public void emitGE(BlockModelPart part, Predicate<Direction> cullTest, Consumer<MutableQuadViewImpl> emitter) {
+    public void emitGE(BlockStateModelPart part, Predicate<Direction> cullTest, Consumer<MutableQuadViewImpl> emitter) {
         AbstractBlockRenderContextAccessor acc = (AbstractBlockRenderContextAccessor) ctx;
 
         TextureAtlasSprite sprite = (this.sprite != null) ?
@@ -105,7 +105,7 @@ public class BlockRenderHelper {
             );
 
             List<BakedQuad> quads = PlatformModelAccess.getInstance().getQuads(
-                    acc.getLevel(), acc.getPos(), part, acc.getState(), cullFace, acc.getRandom(), this.rendertype
+                    acc.getLevel(), acc.getPos(), part, acc.getState(), cullFace, acc.getRandom()
             );
 
             for (int j = 0, count = quads.size(); j < count; ++j) {

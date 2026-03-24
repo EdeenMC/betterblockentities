@@ -9,6 +9,6 @@ pluginManagement {
         mavenCentral()
     }
     plugins {
-        id( "fabric-loom" ) version providers.gradleProperty( "loom_version" ).get()
+        id( "net.fabricmc.fabric-loom" ) version providers.gradleProperty( "loom_version" ).get()
     }
 }

@@ -8,8 +8,10 @@ import betterblockentities.client.render.immediate.blockentity.BlockEntityRender
 
 /* minecraft */
 import net.minecraft.client.model.Model;
+import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.object.chest.ChestModel;
+import net.minecraft.client.renderer.MultiblockChestResources;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.ChestRenderer;
@@ -17,6 +19,8 @@ import net.minecraft.client.renderer.blockentity.state.ChestRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.sprite.SpriteGetter;
+import net.minecraft.client.resources.model.sprite.SpriteId;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.LidBlockEntity;
 import net.minecraft.world.phys.Vec3;
@@ -35,27 +39,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ChestRenderer.class)
 public abstract class ChestRendererMixin <T extends BlockEntity & LidBlockEntity> {
-    @Shadow @Mutable private ChestModel singleModel;
-    @Shadow @Mutable private ChestModel doubleLeftModel;
-    @Shadow @Mutable private ChestModel doubleRightModel;
+    @Shadow @Final public static MultiblockChestResources<ModelLayerLocation> LAYERS;
+    @Final @Shadow @Mutable private MultiblockChestResources<ChestModel> models;
 
-    @Unique private ChestModel BBEsingleChest;
-    @Unique private ChestModel BBEdoubleChestLeft;
-    @Unique private ChestModel BBEdoubleChestRight;
-
-    @Unique private ChestModel singleChestOrg;
-    @Unique private ChestModel doubleChestLeftOrg;
-    @Unique private ChestModel doubleChestRightOrg;
+    @Unique private MultiblockChestResources<ChestModel> orgModels;
+    @Unique private MultiblockChestResources<ChestModel> bbeModels;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void cacheAndInitModels(BlockEntityRendererProvider.Context context, CallbackInfo ci) {
-        this.singleChestOrg = new ChestModel(context.bakeLayer(ModelLayers.CHEST));
-        this.doubleChestLeftOrg = new ChestModel(context.bakeLayer(ModelLayers.DOUBLE_CHEST_LEFT));
-        this.doubleChestRightOrg = new ChestModel(context.bakeLayer(ModelLayers.DOUBLE_CHEST_RIGHT));
-
-        this.BBEsingleChest = new ChestModelOverride(context.bakeLayer(ModelLayers.CHEST));
-        this.BBEdoubleChestLeft = new ChestModelOverride(context.bakeLayer(ModelLayers.DOUBLE_CHEST_LEFT));
-        this.BBEdoubleChestRight = new ChestModelOverride(context.bakeLayer(ModelLayers.DOUBLE_CHEST_RIGHT));
+        orgModels = LAYERS.map(layer -> new ChestModel(context.bakeLayer(layer)));
+        bbeModels = LAYERS.map(layer -> new ChestModelOverride(context.bakeLayer(layer)));
     }
 
     @Inject(method = "extractRenderState(Lnet/minecraft/world/level/block/entity/BlockEntity;Lnet/minecraft/client/renderer/blockentity/state/ChestRenderState;FLnet/minecraft/world/phys/Vec3;Lnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V", at = @At("TAIL"), cancellable = true)
@@ -64,14 +57,12 @@ public abstract class ChestRendererMixin <T extends BlockEntity & LidBlockEntity
         stateExt.blockEntity(blockEntity);
     }
 
-    @Redirect(method = "submit(Lnet/minecraft/client/renderer/blockentity/state/ChestRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/CameraRenderState;)V", at = @At(value = "INVOKE", target = "net/minecraft/client/renderer/SubmitNodeCollector.submitModel (Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/rendertype/RenderType;IIILnet/minecraft/client/renderer/texture/TextureAtlasSprite;ILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V"))
-    public <S> void manageSubmit(SubmitNodeCollector collector, Model<? super S> model, S state, PoseStack poseStack, RenderType renderType, int light, int overlayCoords, int tint, TextureAtlasSprite textureAtlasSprite, int i4, ModelFeatureRenderer.CrumblingOverlay crumblingOverlay, @Local(index = 1)ChestRenderState chestRenderState) {
-        this.singleModel = singleChestOrg;
-        this.doubleLeftModel = doubleChestLeftOrg;
-        this.doubleRightModel = this.doubleChestRightOrg;
+    @Redirect(method = "submit(Lnet/minecraft/client/renderer/blockentity/state/ChestRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V", at = @At(value = "INVOKE", target = "net/minecraft/client/renderer/SubmitNodeCollector.submitModel (Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lcom/mojang/blaze3d/vertex/PoseStack;IIILnet/minecraft/client/resources/model/sprite/SpriteId;Lnet/minecraft/client/resources/model/sprite/SpriteGetter;ILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V"))
+    public <S> void manageSubmit(SubmitNodeCollector collector, Model<S> model, S state, PoseStack poseStack, int light, int overlayCoords, int tint, SpriteId spriteId, SpriteGetter spriteGetter, int i4, ModelFeatureRenderer.CrumblingOverlay crumblingOverlay, @Local(index = 1)ChestRenderState chestRenderState) {
+        this.models = orgModels;
 
         if (!ConfigCache.optimizeChests || !ConfigCache.masterOptimize) {
-            collector.submitModel(model, state, poseStack, renderType, light, overlayCoords, tint, textureAtlasSprite, i4, crumblingOverlay);
+            collector.submitModel(model, state, poseStack, light, overlayCoords, tint, spriteId, spriteGetter, i4, crumblingOverlay);
             return;
         }
 
@@ -79,11 +70,9 @@ public abstract class ChestRendererMixin <T extends BlockEntity & LidBlockEntity
 
         boolean managed = OverlayRenderer.manageCrumblingOverlay(stateExt.blockEntity(), poseStack, model, state, light, overlayCoords, tint, crumblingOverlay);
         if (!managed) {
-            this.singleModel = this.BBEsingleChest;
-            this.doubleLeftModel = this.BBEdoubleChestLeft;
-            this.doubleRightModel = this.BBEdoubleChestRight;
+            this.models = bbeModels;
 
-            collector.submitModel(model, state, poseStack, renderType, light, overlayCoords, tint, textureAtlasSprite, i4, crumblingOverlay);
+            collector.submitModel(model, state, poseStack, light, overlayCoords, tint, spriteId, spriteGetter, i4, crumblingOverlay);
         }
     }
 

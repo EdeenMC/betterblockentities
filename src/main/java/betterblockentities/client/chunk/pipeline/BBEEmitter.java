@@ -18,19 +18,21 @@ import betterblockentities.client.tasks.ResourceTasks;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.blockentity.state.ChestRenderState;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.resources.model.sprite.SpriteId;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.animal.golem.CopperGolemOxidationLevels;
 import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.BlockState;
@@ -56,7 +58,7 @@ import org.jetbrains.annotations.Nullable;
  */
 
 public final class BBEEmitter {
-    private static final ThreadLocal<ArrayList<BlockModelPart>> ALLOCATED_PARTS_LIST = ThreadLocal.withInitial(() -> new ArrayList<>(64));
+    private static final ThreadLocal<ArrayList<BlockStateModelPart>> ALLOCATED_PARTS_LIST = ThreadLocal.withInitial(() -> new ArrayList<>(64));
 
     public static void emit(PlatformModelEmitter instance, BlockStateModel model, Predicate<Direction> isFaceCulled, MutableQuadViewImpl emitter, RandomSource random, BlockAndTintGetter level, LevelSlice slice, BlockPos pos, BlockState state, PlatformModelEmitter.Bufferer bufferer, BlockRenderer blockRenderer) {
         final Block block = state.getBlock();
@@ -193,7 +195,7 @@ public final class BBEEmitter {
         final boolean addBase = (ConfigCache.updateType == EnumTypes.UpdateSchedulerType.FAST.ordinal())
                 || (drawLid && ConfigCache.updateType == EnumTypes.UpdateSchedulerType.SMART.ordinal());
 
-        ArrayList<BlockModelPart> merged = partsBuf();
+        ArrayList<BlockStateModelPart> merged = partsBuf();
         if (addBase) addParts(merged, pairs.get("bottom"), random);
         if (drawLid) {
             addParts(merged, pairs.get("lid"), random);
@@ -204,7 +206,7 @@ public final class BBEEmitter {
         final boolean christmas = ConfigCache.christmasChests;
         ChestRenderState.ChestMaterialType chestMat = MaterialSelector.getChestMaterial(blockEntity, christmas);
         final ChestType type = state.hasProperty(ChestBlock.TYPE) ? state.getValue(ChestBlock.TYPE) : ChestType.SINGLE;
-        final Material material = Sheets.chooseMaterial(chestMat, type);
+        final SpriteId material = Sheets.chooseSprite(chestMat, type);
 
         helper.setMaterial(material);
         helper.setRendertype(ChunkSectionLayer.SOLID);
@@ -227,7 +229,7 @@ public final class BBEEmitter {
         final boolean addBase = (ConfigCache.updateType == EnumTypes.UpdateSchedulerType.FAST.ordinal())
                 || (drawLid && ConfigCache.updateType == EnumTypes.UpdateSchedulerType.SMART.ordinal());
 
-        ArrayList<BlockModelPart> merged = partsBuf();
+        ArrayList<BlockStateModelPart> merged = partsBuf();
         if (addBase) addParts(merged, pairs.get("base"), random);
         if (drawLid) addParts(merged, pairs.get("lid"), random);
         if (merged.isEmpty()) return;
@@ -243,7 +245,7 @@ public final class BBEEmitter {
         };
 
         DyeColor color = ((ShulkerBoxBlock) state.getBlock()).getColor();
-        Material shulkerMaterial = (color == null) ? Sheets.DEFAULT_SHULKER_TEXTURE_LOCATION : Sheets.getShulkerBoxMaterial(color);
+        SpriteId shulkerMaterial = (color == null) ? Sheets.DEFAULT_SHULKER_TEXTURE_LOCATION : Sheets.getShulkerBoxSprite(color);
 
         helper.setMaterial(shulkerMaterial);
         helper.setRendertype(ChunkSectionLayer.CUTOUT);
@@ -261,12 +263,12 @@ public final class BBEEmitter {
         Map<String, BlockStateModel> pairs = getPairs(layerLocation);
         if (pairs.isEmpty()) return;
 
-        ArrayList<BlockModelPart> merged = partsBuf();
+        ArrayList<BlockStateModelPart> merged = partsBuf();
         addAllParts(merged, pairs.values(), random);
         if (merged.isEmpty()) return;
 
         WoodType woodType = ((SignBlock) state.getBlock()).type();
-        Material signMaterial = Sheets.getSignMaterial(woodType);
+        SpriteId signMaterial = Sheets.getSignSprite(woodType);
 
         helper.setMaterial(signMaterial);
         helper.setRendertype(ChunkSectionLayer.SOLID);
@@ -285,14 +287,15 @@ public final class BBEEmitter {
         if (pairs.isEmpty()) return;
 
         WoodType woodType = ((SignBlock) state.getBlock()).type();
-        Material signMaterial = Sheets.getHangingSignMaterial(woodType);
+        SpriteId signMaterial = Sheets.getHangingSignSprite(woodType);
 
-        ArrayList<BlockModelPart> merged = partsBuf();
+        ArrayList<BlockStateModelPart> merged = partsBuf();
         addAllParts(merged, pairs.values(), random);
 
         BlockStateModel chains = pairs.get(attached ? "vChains" : "normalChains");
         if (chains != null) {
-            List<BlockModelPart> chainParts = chains.collectParts(random);
+            List<BlockStateModelPart> chainParts = new ArrayList<>();
+            chains.collectParts(random, chainParts);
             if (!chainParts.isEmpty()) {
                 float[] rotation = {0f, (BlockRenderHelper.getRotationFromBlockState(state) + 180f) % 360f};
                 helper.setRotation(rotation);
@@ -319,10 +322,12 @@ public final class BBEEmitter {
         BlockStateModel bellBody = pairs.get("bell_body");
         if (bellBody == null) return;
 
-        List<BlockModelPart> bellBodyParts = bellBody.collectParts(random);
+        List<BlockStateModelPart> bellBodyParts = new ArrayList<>();
+        bellBody.collectParts(random, bellBodyParts);
+
         if (bellBodyParts.isEmpty()) return;
 
-        Material bellBodyMaterial = Sheets.BLOCK_ENTITIES_MAPPER.defaultNamespaceApply("bell/bell_body");
+        SpriteId bellBodyMaterial = Sheets.BLOCK_ENTITIES_MAPPER.defaultNamespaceApply("bell/bell_body");
 
         helper.setMaterial(bellBodyMaterial);
         helper.setRendertype(ChunkSectionLayer.SOLID);
@@ -335,12 +340,12 @@ public final class BBEEmitter {
         Map<String, BlockStateModel> pairs = getPairs(layer);
         if (pairs.isEmpty()) return;
 
-        ArrayList<BlockModelPart> merged = partsBuf();
+        ArrayList<BlockStateModelPart> merged = partsBuf();
         addAllParts(merged, pairs.values(), random);
         if (merged.isEmpty()) return;
 
         DyeColor color = ((BedBlock) state.getBlock()).getColor();
-        Material bedMaterial = Sheets.getBedMaterial(color);
+        SpriteId bedMaterial = Sheets.getBedSprite(color);
 
         helper.setMaterial(bedMaterial);
         helper.setRendertype(ChunkSectionLayer.SOLID);
@@ -355,7 +360,7 @@ public final class BBEEmitter {
         Map<String, BlockStateModel> sidePairs = getPairs(ModelLayers.DECORATED_POT_SIDES);
         if (basePairs.isEmpty() || sidePairs.isEmpty()) return;
 
-        ArrayList<BlockModelPart> baseParts = partsBuf();
+        ArrayList<BlockStateModelPart> baseParts = partsBuf();
         addAllParts(baseParts, basePairs.values(), random);
         if (!baseParts.isEmpty()) {
             helper.setMaterial(Sheets.DECORATED_POT_BASE);
@@ -369,10 +374,12 @@ public final class BBEEmitter {
             BlockStateModel m = e.getValue();
             if (m == null) continue;
 
-            List<BlockModelPart> sideParts = m.collectParts(random);
+            List<BlockStateModelPart> sideParts = new ArrayList<>();
+            m.collectParts(random, sideParts);
+
             if (sideParts.isEmpty()) continue;
 
-            Material sideMaterial = switch (key) {
+            SpriteId sideMaterial = switch (key) {
                 case "back"  -> MaterialSelector.getDPSideMaterial(decorations.back());
                 case "front" -> MaterialSelector.getDPSideMaterial(decorations.front());
                 case "left"  -> MaterialSelector.getDPSideMaterial(decorations.left());
@@ -397,17 +404,20 @@ public final class BBEEmitter {
         Map<String, BlockStateModel> canvasPairs = getPairs(flagLayer);
         if (basePairs.isEmpty() || canvasPairs.isEmpty()) return;
 
-        ArrayList<BlockModelPart> baseParts = partsBuf();
+        ArrayList<BlockStateModelPart> baseParts = partsBuf();
         addAllParts(baseParts, basePairs.values(), random);
 
-        ArrayList<BlockModelPart> canvasParts = new ArrayList<>(32);
+        ArrayList<BlockStateModelPart> canvasParts = new ArrayList<>(32);
         for (BlockStateModel m : canvasPairs.values()) {
-            List<BlockModelPart> parts = m.collectParts(random);
+            List<BlockStateModelPart> parts = new ArrayList<>();
+            m.collectParts(random, parts);
+
+
             if (!parts.isEmpty()) canvasParts.addAll(parts);
         }
 
         if (!baseParts.isEmpty()) {
-            helper.setMaterial(ModelBakery.BANNER_BASE);
+            helper.setMaterial(Sheets.BANNER_BASE);
             helper.setRendertype(ChunkSectionLayer.SOLID);
             BlockRenderHelper.emitModelPart(baseParts, emitter, state, isFaceCulled, helper::emitGE);
         }
@@ -421,7 +431,7 @@ public final class BBEEmitter {
         final ChunkSectionLayer rt = (ConfigCache.bannerGraphics == fancy) ? ChunkSectionLayer.TRANSLUCENT : ChunkSectionLayer.CUTOUT;
 
         for (BannerPatternLayers.Layer layer : bannerBE.getPatterns().layers()) {
-            Material layerMaterial = MaterialSelector.getBannerMaterial(layer.pattern());
+            SpriteId layerMaterial = MaterialSelector.getBannerMaterial(layer.pattern());
             DyeColor layerColor = layer.color();
 
             helper.setMaterial(layerMaterial);
@@ -441,7 +451,7 @@ public final class BBEEmitter {
         Map<String, BlockStateModel> pairs = getPairs(layerLocation);
         if (pairs.isEmpty()) return;
 
-        ArrayList<BlockModelPart> merged = partsBuf();
+        ArrayList<BlockStateModelPart> merged = partsBuf();
         addAllParts(merged, pairs.values(), random);
         if (merged.isEmpty()) return;
 
@@ -493,19 +503,21 @@ public final class BBEEmitter {
         return tryGetPairs(location);
     }
 
-    private static ArrayList<BlockModelPart> partsBuf() {
-        ArrayList<BlockModelPart> buf = ALLOCATED_PARTS_LIST.get();
+    private static ArrayList<BlockStateModelPart> partsBuf() {
+        ArrayList<BlockStateModelPart> buf = ALLOCATED_PARTS_LIST.get();
         buf.clear();
         return buf;
     }
 
-    private static void addParts(ArrayList<BlockModelPart> out, BlockStateModel model, RandomSource random) {
+    private static void addParts(ArrayList<BlockStateModelPart> out, BlockStateModel model, RandomSource random) {
         if (model == null) return;
-        List<BlockModelPart> parts = model.collectParts(random);
+        List<BlockStateModelPart> parts = new ArrayList<>();
+        model.collectParts(random, parts);
+
         if (!parts.isEmpty()) out.addAll(parts);
     }
 
-    private static void addAllParts(ArrayList<BlockModelPart> out, Iterable<BlockStateModel> models, RandomSource random) {
+    private static void addAllParts(ArrayList<BlockStateModelPart> out, Iterable<BlockStateModel> models, RandomSource random) {
         for (BlockStateModel m : models) {
             addParts(out, m, random);
         }

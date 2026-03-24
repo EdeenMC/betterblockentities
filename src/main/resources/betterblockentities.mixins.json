@@ -3,16 +3,18 @@
   "package": "betterblockentities.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "core.MinecraftMixin",
     "core.ClientLevelMixin",
+    "core.MinecraftMixin",
     "gui.DebugScreenEntriesAccessor",
     "model.item.ChestSpecialRendererMixin",
     "model.item.ClientItemInfoLoaderMixin",
     "model.modelpart.ModelPartAccessor",
     "render.LevelRendererMixin",
+    "render.immediate.BlockEntityRenderStateMixin",
     "render.immediate.ModelFeatureRendererMixin",
     "render.immediate.blockentity.BlockEntityMixin",
     "render.immediate.blockentity.banner.BannerBlockEntityMixin",
+    "render.immediate.blockentity.banner.BannerRendererAccessor",
     "render.immediate.blockentity.banner.BannerRendererMixin",
     "render.immediate.blockentity.bed.BedBlockEntityMixin",
     "render.immediate.blockentity.bed.BedRendererMixin",
@@ -30,8 +32,6 @@
     "render.immediate.blockentity.shulker.ShulkerBoxRendererMixin",
     "render.immediate.blockentity.sign.AbstractSignRendererMixin",
     "render.immediate.blockentity.sign.SignBlockEntityMixin",
-    "render.immediate.BlockEntityRenderStateMixin",
-    "render.immediate.blockentity.banner.BannerRendererAccessor",
     "render.texture.AtlasManagerMixin",
     "render.texture.MipMapGeneratorAccessor",
     "render.texture.MipMapGeneratorMixin",
@@ -48,5 +48,6 @@
     "defaultRequire": 1
   },
   "client": [
+    "render.immediate.BlockEntityRenderStateAccessor"
   ]
 }
