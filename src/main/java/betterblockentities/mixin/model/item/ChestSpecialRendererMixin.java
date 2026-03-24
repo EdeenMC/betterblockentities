@@ -37,11 +37,14 @@ public class ChestSpecialRendererMixin {
         if (path.contains("normal") || path.contains("trapped")) {
             if (SpecialDates.isExtendedChristmas()) {
                 collector.submitModel(model, state, poseStack, light, overlayCoords, -1, spriteId, spriteGetter, i4, null);
+                return;
             }
             else if (ConfigCache.masterOptimize && ConfigCache.optimizeChests && ConfigCache.christmasChests) {
                 SpriteId christmasId = Sheets.CHEST_MAPPER.apply(CHRISTMAS.single());
                 collector.submitModel(model, state, poseStack, light, overlayCoords, -1, christmasId, spriteGetter, i4, null);
+                return;
             }
         }
+        collector.submitModel(model, state, poseStack, light, overlayCoords, -1, spriteId, spriteGetter, i4, null);
     }
 }
