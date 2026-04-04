@@ -8,7 +8,6 @@
     { "type": "directory", "source": "entity/signs", "prefix": "entity/signs/" },
     { "type": "directory", "source": "entity/signs/hanging", "prefix": "entity/signs/hanging/" },
     { "type": "directory", "source": "entity/banner", "prefix": "entity/banner/" },
-    { "type": "directory", "source": "entity/copper_golem", "prefix": "entity/copper_golem/" },
-    { "type": "single", "resource": "minecraft:entity/banner_base" }
+    { "type": "directory", "source": "entity/copper_golem", "prefix": "entity/copper_golem/" }
   ]
 }
