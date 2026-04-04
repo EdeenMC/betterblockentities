@@ -1,10 +1,10 @@
 package betterblockentities.mixin.render.immediate.blockentity.sign;
 
 /* local */
-import betterblockentities.client.render.immediate.blockentity.BlockEntityExt;
+import betterblockentities.client.render.immediate.blockentity.extentions.BlockEntityExt;
 
 /* minecraft */
-import betterblockentities.client.render.immediate.blockentity.InstancedBlockEntityManager;
+import betterblockentities.client.render.immediate.blockentity.manager.InstancedBlockEntityManager;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 
 /* mixin */

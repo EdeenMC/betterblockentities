@@ -1,8 +1,8 @@
-package betterblockentities.mixin.render.immediate.blockentity;
+package betterblockentities.mixin.render.immediate.blockentity.extentions;
 
 /* local */
-import betterblockentities.client.render.immediate.blockentity.BlockEntityExt;
-import betterblockentities.client.render.immediate.blockentity.RenderingMode;
+import betterblockentities.client.render.immediate.blockentity.extentions.BlockEntityExt;
+import betterblockentities.client.render.immediate.blockentity.misc.RenderingMode;
 
 /* minecraft */
 import net.minecraft.world.level.block.entity.BlockEntity;

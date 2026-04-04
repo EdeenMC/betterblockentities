@@ -2,8 +2,8 @@ package betterblockentities.mixin.render.immediate.blockentity.chest;
 
 /* local */
 import betterblockentities.client.gui.config.ConfigCache;
-import betterblockentities.client.render.immediate.blockentity.BlockEntityExt;
-import betterblockentities.client.render.immediate.blockentity.InstancedBlockEntityManager;
+import betterblockentities.client.render.immediate.blockentity.extentions.BlockEntityExt;
+import betterblockentities.client.render.immediate.blockentity.manager.InstancedBlockEntityManager;
 
 /* minecraft */
 import net.minecraft.core.BlockPos;
@@ -18,7 +18,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(EnderChestBlockEntity.class)
 public abstract class EnderChestBlockEntityMixin {

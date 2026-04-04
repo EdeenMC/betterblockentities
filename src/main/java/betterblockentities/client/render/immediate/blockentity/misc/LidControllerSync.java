@@ -1,8 +1,9 @@
-package betterblockentities.client.render.immediate.blockentity;
+package betterblockentities.client.render.immediate.blockentity.misc;
 
 /* local */
 import betterblockentities.client.chunk.section.SectionUpdateDispatcher;
 import betterblockentities.client.gui.config.ConfigCache;
+import betterblockentities.client.render.immediate.blockentity.extentions.BlockEntityExt;
 import betterblockentities.client.render.immediate.util.BlockVisibilityChecker;
 import betterblockentities.mixin.render.immediate.blockentity.chest.ChestBlockEntityAccessor;
 import betterblockentities.mixin.render.immediate.blockentity.chest.ChestLidControllerAccessor;

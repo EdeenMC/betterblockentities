@@ -1,4 +1,6 @@
-package betterblockentities.client.render.immediate.blockentity;
+package betterblockentities.client.render.immediate.blockentity.extentions;
+
+import betterblockentities.client.render.immediate.blockentity.misc.RenderingMode;
 
 public interface BlockEntityExt {
     boolean supportedBlockEntity();

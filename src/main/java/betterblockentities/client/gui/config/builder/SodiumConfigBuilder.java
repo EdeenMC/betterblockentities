@@ -35,8 +35,8 @@ public class SodiumConfigBuilder implements ConfigEntryPoint {
                             .setDefaultValue(true)
                             .setImpact(OptionImpact.HIGH)
                             .setBinding(
-                                value -> BBE.CONFIG.MAIN.setOption("optimize.master", value),
-                                () -> (boolean) BBE.CONFIG.MAIN.getOption("optimize.master").getValue()
+                                value -> BBE.GlobalScope.CONFIG.MAIN.setOption("optimize.master", value),
+                                () -> (boolean) BBE.GlobalScope.CONFIG.MAIN.getOption("optimize.master").getValue()
                             )
                             .setFlags(OptionFlag.REQUIRES_ASSET_RELOAD)
                             .setStorageHandler(this.saveMainConfigStorageObject)
@@ -49,8 +49,8 @@ public class SodiumConfigBuilder implements ConfigEntryPoint {
                             .setDefaultValue(true)
                             .setImpact(OptionImpact.HIGH)
                             .setBinding(
-                                    value -> BBE.CONFIG.MAIN.setOption("optimize.chest", value),
-                                    () -> (boolean) BBE.CONFIG.MAIN.getOption("optimize.chest").getValue()
+                                    value -> BBE.GlobalScope.CONFIG.MAIN.setOption("optimize.chest", value),
+                                    () -> (boolean) BBE.GlobalScope.CONFIG.MAIN.getOption("optimize.chest").getValue()
                             )
                             .setEnabledProvider(c ->
                                     c.readBooleanOption(Identifier.parse("bbe:master")), Identifier.parse("bbe:master")
@@ -65,8 +65,8 @@ public class SodiumConfigBuilder implements ConfigEntryPoint {
                             .setDefaultValue(true)
                             .setImpact(OptionImpact.LOW)
                             .setBinding(
-                                    value -> BBE.CONFIG.MAIN.setOption("animation.chest", value),
-                                    () -> (boolean) BBE.CONFIG.MAIN.getOption("animation.chest").getValue()
+                                    value -> BBE.GlobalScope.CONFIG.MAIN.setOption("animation.chest", value),
+                                    () -> (boolean) BBE.GlobalScope.CONFIG.MAIN.getOption("animation.chest").getValue()
                             )
                             .setEnabledProvider(c ->
                                     c.readBooleanOption(Identifier.parse("bbe:master")) &&
@@ -83,8 +83,8 @@ public class SodiumConfigBuilder implements ConfigEntryPoint {
                             .setDefaultValue(false)
                             .setImpact(OptionImpact.LOW)
                             .setBinding(
-                                    value -> BBE.CONFIG.MAIN.setOption("misc.christmas_chest", value),
-                                    () -> (boolean) BBE.CONFIG.MAIN.getOption("misc.christmas_chest").getValue()
+                                    value -> BBE.GlobalScope.CONFIG.MAIN.setOption("misc.christmas_chest", value),
+                                    () -> (boolean) BBE.GlobalScope.CONFIG.MAIN.getOption("misc.christmas_chest").getValue()
                             )
                             .setEnabledProvider(c ->
                                     c.readBooleanOption(Identifier.parse("bbe:master")) &&
@@ -104,8 +104,8 @@ public class SodiumConfigBuilder implements ConfigEntryPoint {
                             .setDefaultValue(true)
                             .setImpact(OptionImpact.HIGH)
                             .setBinding(
-                                    value -> BBE.CONFIG.MAIN.setOption("optimize.shulker", value),
-                                    () -> (boolean) BBE.CONFIG.MAIN.getOption("optimize.shulker").getValue()
+                                    value -> BBE.GlobalScope.CONFIG.MAIN.setOption("optimize.shulker", value),
+                                    () -> (boolean) BBE.GlobalScope.CONFIG.MAIN.getOption("optimize.shulker").getValue()
                             )
                             .setEnabledProvider(c ->
                                     c.readBooleanOption(Identifier.parse("bbe:master")), Identifier.parse("bbe:master")
@@ -120,8 +120,8 @@ public class SodiumConfigBuilder implements ConfigEntryPoint {
                             .setDefaultValue(true)
                             .setImpact(OptionImpact.LOW)
                             .setBinding(
-                                    value -> BBE.CONFIG.MAIN.setOption("animation.shulker", value),
-                                    () -> (boolean) BBE.CONFIG.MAIN.getOption("animation.shulker").getValue()
+                                    value -> BBE.GlobalScope.CONFIG.MAIN.setOption("animation.shulker", value),
+                                    () -> (boolean) BBE.GlobalScope.CONFIG.MAIN.getOption("animation.shulker").getValue()
                             )
                             .setEnabledProvider(c ->
                                     c.readBooleanOption(Identifier.parse("bbe:master")) &&
@@ -141,8 +141,8 @@ public class SodiumConfigBuilder implements ConfigEntryPoint {
                             .setDefaultValue(true)
                             .setImpact(OptionImpact.HIGH)
                             .setBinding(
-                                    value -> BBE.CONFIG.MAIN.setOption("optimize.sign", value),
-                                    () -> (boolean) BBE.CONFIG.MAIN.getOption("optimize.sign").getValue()
+                                    value -> BBE.GlobalScope.CONFIG.MAIN.setOption("optimize.sign", value),
+                                    () -> (boolean) BBE.GlobalScope.CONFIG.MAIN.getOption("optimize.sign").getValue()
                             )
                             .setEnabledProvider(c ->
                                     c.readBooleanOption(Identifier.parse("bbe:master")), Identifier.parse("bbe:master")
@@ -157,8 +157,8 @@ public class SodiumConfigBuilder implements ConfigEntryPoint {
                             .setDefaultValue(true)
                             .setImpact(OptionImpact.MEDIUM)
                             .setBinding(
-                                    value -> BBE.CONFIG.MAIN.setOption("misc.sign_text", value),
-                                    () -> (boolean) BBE.CONFIG.MAIN.getOption("misc.sign_text").getValue()
+                                    value -> BBE.GlobalScope.CONFIG.MAIN.setOption("misc.sign_text", value),
+                                    () -> (boolean) BBE.GlobalScope.CONFIG.MAIN.getOption("misc.sign_text").getValue()
                             )
                             .setEnabledProvider(c ->
                                     c.readBooleanOption(Identifier.parse("bbe:master")) &&
@@ -175,8 +175,8 @@ public class SodiumConfigBuilder implements ConfigEntryPoint {
                             .setDefaultValue(16)
                             .setImpact(OptionImpact.MEDIUM)
                             .setBinding(
-                                    value -> BBE.CONFIG.MAIN.setOption("misc.sign_text_distance", value),
-                                    () -> (int) BBE.CONFIG.MAIN.getOption("misc.sign_text_distance").getValue()
+                                    value -> BBE.GlobalScope.CONFIG.MAIN.setOption("misc.sign_text_distance", value),
+                                    () -> (int) BBE.GlobalScope.CONFIG.MAIN.getOption("misc.sign_text_distance").getValue()
                             )
                             .setRange(new Range(1, 64, 1))
                             .setValueFormatter(ControlValueFormatterImpls.number())
@@ -197,8 +197,8 @@ public class SodiumConfigBuilder implements ConfigEntryPoint {
                             .setDefaultValue(true)
                             .setImpact(OptionImpact.MEDIUM)
                             .setBinding(
-                                    value -> BBE.CONFIG.MAIN.setOption("misc.sign_text_culling", value),
-                                    () -> (boolean) BBE.CONFIG.MAIN.getOption("misc.sign_text_culling").getValue()
+                                    value -> BBE.GlobalScope.CONFIG.MAIN.setOption("misc.sign_text_culling", value),
+                                    () -> (boolean) BBE.GlobalScope.CONFIG.MAIN.getOption("misc.sign_text_culling").getValue()
                             )
                             .setEnabledProvider(c ->
                                     c.readBooleanOption(Identifier.parse("bbe:master")) &&
@@ -220,8 +220,8 @@ public class SodiumConfigBuilder implements ConfigEntryPoint {
                             .setDefaultValue(true)
                             .setImpact(OptionImpact.HIGH)
                             .setBinding(
-                                    value -> BBE.CONFIG.MAIN.setOption("optimize.decoratedpot", value),
-                                    () -> (boolean) BBE.CONFIG.MAIN.getOption("optimize.decoratedpot").getValue()
+                                    value -> BBE.GlobalScope.CONFIG.MAIN.setOption("optimize.decoratedpot", value),
+                                    () -> (boolean) BBE.GlobalScope.CONFIG.MAIN.getOption("optimize.decoratedpot").getValue()
                             )
                             .setEnabledProvider(c ->
                                     c.readBooleanOption(Identifier.parse("bbe:master")), Identifier.parse("bbe:master")
@@ -236,8 +236,8 @@ public class SodiumConfigBuilder implements ConfigEntryPoint {
                             .setDefaultValue(true)
                             .setImpact(OptionImpact.LOW)
                             .setBinding(
-                                    value -> BBE.CONFIG.MAIN.setOption("animation.decoratedpot", value),
-                                    () -> (boolean) BBE.CONFIG.MAIN.getOption("animation.decoratedpot").getValue()
+                                    value -> BBE.GlobalScope.CONFIG.MAIN.setOption("animation.decoratedpot", value),
+                                    () -> (boolean) BBE.GlobalScope.CONFIG.MAIN.getOption("animation.decoratedpot").getValue()
                             )
                             .setEnabledProvider(c ->
                                     c.readBooleanOption(Identifier.parse("bbe:master")) &&
@@ -257,8 +257,8 @@ public class SodiumConfigBuilder implements ConfigEntryPoint {
                             .setDefaultValue(true)
                             .setImpact(OptionImpact.HIGH)
                             .setBinding(
-                                    value -> BBE.CONFIG.MAIN.setOption("optimize.banner", value),
-                                    () -> (boolean) BBE.CONFIG.MAIN.getOption("optimize.banner").getValue()
+                                    value -> BBE.GlobalScope.CONFIG.MAIN.setOption("optimize.banner", value),
+                                    () -> (boolean) BBE.GlobalScope.CONFIG.MAIN.getOption("optimize.banner").getValue()
                             )
                             .setEnabledProvider(c ->
                                     c.readBooleanOption(Identifier.parse("bbe:master")), Identifier.parse("bbe:master")
@@ -273,8 +273,8 @@ public class SodiumConfigBuilder implements ConfigEntryPoint {
                             .setDefaultValue(16)
                             .setImpact(OptionImpact.MEDIUM)
                             .setBinding(
-                                    value -> BBE.CONFIG.MAIN.setOption("misc.banner_pose", value),
-                                    () -> (int) BBE.CONFIG.MAIN.getOption("misc.banner_pose").getValue()
+                                    value -> BBE.GlobalScope.CONFIG.MAIN.setOption("misc.banner_pose", value),
+                                    () -> (int) BBE.GlobalScope.CONFIG.MAIN.getOption("misc.banner_pose").getValue()
                             )
                             .setRange(new Range(1, 9, 1))
                             .setValueFormatter(ControlValueFormatterImpls.number())
@@ -293,8 +293,8 @@ public class SodiumConfigBuilder implements ConfigEntryPoint {
                             .setDefaultValue(EnumTypes.BannerGraphicsType.FANCY)
                             .setImpact(OptionImpact.VARIES)
                             .setBinding(
-                                    value -> BBE.CONFIG.MAIN.setOption("misc.banner_graphics", EnumTypes.BannerGraphicsType.map(value)),
-                                    () -> EnumTypes.BannerGraphicsType.map((int)BBE.CONFIG.MAIN.getOption("misc.banner_graphics").getValue())
+                                    value -> BBE.GlobalScope.CONFIG.MAIN.setOption("misc.banner_graphics", EnumTypes.BannerGraphicsType.map(value)),
+                                    () -> EnumTypes.BannerGraphicsType.map((int)BBE.GlobalScope.CONFIG.MAIN.getOption("misc.banner_graphics").getValue())
                             )
                             .setElementNameProvider(e -> new Component[]{
                                     Component.translatable("bbe.config.storage.main.misc.banner_graphics.type.fast"),
@@ -318,8 +318,8 @@ public class SodiumConfigBuilder implements ConfigEntryPoint {
                             .setDefaultValue(true)
                             .setImpact(OptionImpact.HIGH)
                             .setBinding(
-                                    value -> BBE.CONFIG.MAIN.setOption("optimize.bell", value),
-                                    () -> (boolean) BBE.CONFIG.MAIN.getOption("optimize.bell").getValue()
+                                    value -> BBE.GlobalScope.CONFIG.MAIN.setOption("optimize.bell", value),
+                                    () -> (boolean) BBE.GlobalScope.CONFIG.MAIN.getOption("optimize.bell").getValue()
                             )
                             .setEnabledProvider(c ->
                                     c.readBooleanOption(Identifier.parse("bbe:master")), Identifier.parse("bbe:master")
@@ -334,8 +334,8 @@ public class SodiumConfigBuilder implements ConfigEntryPoint {
                             .setDefaultValue(true)
                             .setImpact(OptionImpact.LOW)
                             .setBinding(
-                                    value -> BBE.CONFIG.MAIN.setOption("animation.bell", value),
-                                    () -> (boolean) BBE.CONFIG.MAIN.getOption("animation.bell").getValue()
+                                    value -> BBE.GlobalScope.CONFIG.MAIN.setOption("animation.bell", value),
+                                    () -> (boolean) BBE.GlobalScope.CONFIG.MAIN.getOption("animation.bell").getValue()
                             )
                             .setEnabledProvider(c ->
                                     c.readBooleanOption(Identifier.parse("bbe:master")) &&
@@ -355,8 +355,8 @@ public class SodiumConfigBuilder implements ConfigEntryPoint {
                             .setDefaultValue(true)
                             .setImpact(OptionImpact.HIGH)
                             .setBinding(
-                                    value -> BBE.CONFIG.MAIN.setOption("optimize.bed", value),
-                                    () -> (boolean) BBE.CONFIG.MAIN.getOption("optimize.bed").getValue()
+                                    value -> BBE.GlobalScope.CONFIG.MAIN.setOption("optimize.bed", value),
+                                    () -> (boolean) BBE.GlobalScope.CONFIG.MAIN.getOption("optimize.bed").getValue()
                             )
                             .setEnabledProvider(c ->
                                     c.readBooleanOption(Identifier.parse("bbe:master")), Identifier.parse("bbe:master")
@@ -374,8 +374,46 @@ public class SodiumConfigBuilder implements ConfigEntryPoint {
                                 .setDefaultValue(true)
                                 .setImpact(OptionImpact.HIGH)
                                 .setBinding(
-                                        value -> BBE.CONFIG.MAIN.setOption("optimize.copper_golem_statue", value),
-                                        () -> (boolean) BBE.CONFIG.MAIN.getOption("optimize.copper_golem_statue").getValue()
+                                        value -> BBE.GlobalScope.CONFIG.MAIN.setOption("optimize.copper_golem_statue", value),
+                                        () -> (boolean) BBE.GlobalScope.CONFIG.MAIN.getOption("optimize.copper_golem_statue").getValue()
+                                )
+                                .setEnabledProvider(c ->
+                                        c.readBooleanOption(Identifier.parse("bbe:master")), Identifier.parse("bbe:master")
+                                )
+                                .setFlags(OptionFlag.REQUIRES_ASSET_RELOAD)
+                                .setStorageHandler(this.saveMainConfigStorageObject)
+                )
+        );
+
+        BBEPage.addOptionGroup(builder.createOptionGroup()
+                .addOption(
+                        builder.createBooleanOption(Identifier.parse("bbe:optimize.shelf"))
+                                .setName(Component.translatable("bbe.config.storage.main.optimize.shelf"))
+                                .setTooltip(Component.translatable("bbe.config.storage.main.optimize.shelf.tooltip"))
+                                .setDefaultValue(true)
+                                .setImpact(OptionImpact.HIGH)
+                                .setBinding(
+                                        value -> BBE.GlobalScope.CONFIG.MAIN.setOption("optimize.shelf", value),
+                                        () -> (boolean) BBE.GlobalScope.CONFIG.MAIN.getOption("optimize.shelf").getValue()
+                                )
+                                .setEnabledProvider(c ->
+                                        c.readBooleanOption(Identifier.parse("bbe:master")), Identifier.parse("bbe:master")
+                                )
+                                .setFlags(OptionFlag.REQUIRES_ASSET_RELOAD)
+                                .setStorageHandler(this.saveMainConfigStorageObject)
+                )
+        );
+
+        BBEPage.addOptionGroup(builder.createOptionGroup()
+                .addOption(
+                        builder.createBooleanOption(Identifier.parse("bbe:optimize.campfire"))
+                                .setName(Component.translatable("bbe.config.storage.main.optimize.campfire"))
+                                .setTooltip(Component.translatable("bbe.config.storage.main.optimize.campfire.tooltip"))
+                                .setDefaultValue(true)
+                                .setImpact(OptionImpact.HIGH)
+                                .setBinding(
+                                        value -> BBE.GlobalScope.CONFIG.MAIN.setOption("optimize.campfire", value),
+                                        () -> (boolean) BBE.GlobalScope.CONFIG.MAIN.getOption("optimize.campfire").getValue()
                                 )
                                 .setEnabledProvider(c ->
                                         c.readBooleanOption(Identifier.parse("bbe:master")), Identifier.parse("bbe:master")
@@ -397,8 +435,8 @@ public class SodiumConfigBuilder implements ConfigEntryPoint {
                             .setDefaultValue(EnumTypes.UpdateSchedulerType.SMART)
                             .setImpact(OptionImpact.VARIES)
                             .setBinding(
-                                    value -> BBE.CONFIG.MAIN.setOption("misc.update_scheduler", EnumTypes.UpdateSchedulerType.map(value)),
-                                    () -> EnumTypes.UpdateSchedulerType.map((int)BBE.CONFIG.MAIN.getOption("misc.update_scheduler").getValue())
+                                    value -> BBE.GlobalScope.CONFIG.MAIN.setOption("misc.update_scheduler", EnumTypes.UpdateSchedulerType.map(value)),
+                                    () -> EnumTypes.UpdateSchedulerType.map((int)BBE.GlobalScope.CONFIG.MAIN.getOption("misc.update_scheduler").getValue())
                             )
                             .setElementNameProvider(e -> new Component[]{
                                     Component.translatable("bbe.config.storage.main.misc.update_scheduler.type.fast"),

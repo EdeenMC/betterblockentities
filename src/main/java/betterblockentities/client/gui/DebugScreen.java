@@ -26,6 +26,6 @@ public class DebugScreen implements DebugScreenEntry {
         return true;
     }
     @Override public @NonNull DebugEntryCategory category() {
-        return BBE.DEBUG_CATEGORY;
+        return BBE.GlobalScope.DEBUG_CATEGORY;
     }
 }

@@ -1,11 +1,14 @@
-package betterblockentities.client.render.immediate.blockentity;
+package betterblockentities.client.render.immediate.blockentity.manager;
 
 /* local */
+import betterblockentities.api.render.AltRenderers;
 import betterblockentities.client.BBE;
 import betterblockentities.client.chunk.section.SectionUpdateDispatcher;
 import betterblockentities.client.gui.config.BBEConfig;
 import betterblockentities.client.gui.config.ConfigCache;
 import betterblockentities.client.gui.option.EnumTypes;
+import betterblockentities.client.render.immediate.blockentity.misc.RenderingMode;
+import betterblockentities.client.render.immediate.blockentity.extentions.BlockEntityExt;
 import betterblockentities.client.render.immediate.util.BlockVisibilityChecker;
 import betterblockentities.client.tasks.ManagerTasks;
 
@@ -110,7 +113,8 @@ public final class InstancedBlockEntityManager {
     public int run() {
         if (!ConfigCache.masterOptimize
                 || !ext.supportedBlockEntity()
-                || !BBEConfig.OptEnabledTable.ENABLED[ext.optKind() & 0xFF]) {
+                || !BBEConfig.OptEnabledTable.ENABLED[ext.optKind() & 0xFF]
+                || AltRenderers.hasRendererOverride(blockEntity.getType())) {
             phase = Phase.IDLE;
             return ManagerTasks.FINISHED;
         }
@@ -242,7 +246,7 @@ public final class InstancedBlockEntityManager {
     }
 
     private boolean isVisibleInFov() {
-        return BlockVisibilityChecker.isBlockInFOVAndVisible(BBE.curFrustum, blockEntity) == BlockVisibilityChecker.Visibility.VISIBLE;
+        return BlockVisibilityChecker.isBlockInFOVAndVisible(BBE.GlobalScope.frustum, blockEntity) == BlockVisibilityChecker.Visibility.VISIBLE;
     }
 
     public static final class OptKind {
@@ -257,5 +261,7 @@ public final class InstancedBlockEntityManager {
         public static final byte BANNER = 6;
         public static final byte BELL   = 7;
         public static final byte CGS    = 8;
+        public static final byte SHELF  = 9;
+        public static final byte CAMPFIRE  = 10;
     }
 }

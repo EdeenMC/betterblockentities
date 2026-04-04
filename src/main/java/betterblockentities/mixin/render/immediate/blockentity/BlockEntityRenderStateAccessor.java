@@ -1,4 +1,4 @@
-package betterblockentities.mixin.render.immediate;
+package betterblockentities.mixin.render.immediate.blockentity;
 
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.world.level.block.state.BlockState;

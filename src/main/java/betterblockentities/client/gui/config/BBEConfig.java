@@ -10,7 +10,7 @@ import betterblockentities.client.gui.storage.ConfigStorageObject;
 import betterblockentities.client.gui.storage.ConfigStorageIdentifiers;
 
 /* minecraft */
-import betterblockentities.client.render.immediate.blockentity.InstancedBlockEntityManager;
+import betterblockentities.client.render.immediate.blockentity.manager.InstancedBlockEntityManager;
 
 /* gson */
 import com.google.gson.*;
@@ -211,7 +211,8 @@ public class BBEConfig {
         ConfigCache.optimizeCopperGolemStatue = GenericConfigWrapper.MainStorage.optimizeCopperGolemStatue();
         ConfigCache.updateType = BBE.LoadedModList.EMF ? EnumTypes.UpdateSchedulerType.SMART.ordinal() : GenericConfigWrapper.MainStorage.updateScheduler();
         ConfigCache.signTextCulling = GenericConfigWrapper.MainStorage.signTextCulling();
-        ConfigCache.debugOverlays = GenericConfigWrapper.HiddenStorage.debugOverlays();
+        ConfigCache.optimizeShelves = GenericConfigWrapper.MainStorage.optimizeShelf();
+        ConfigCache.optimizeCampfire = GenericConfigWrapper.MainStorage.optimizeCampfire();
 
         OptEnabledTable.rebuildFromConfig();
     }
@@ -233,6 +234,8 @@ public class BBEConfig {
             ENABLED[InstancedBlockEntityManager.OptKind.BANNER]  = ConfigCache.optimizeBanners;
             ENABLED[InstancedBlockEntityManager.OptKind.BELL]    = ConfigCache.optimizeBells;
             ENABLED[InstancedBlockEntityManager.OptKind.CGS]     = ConfigCache.optimizeCopperGolemStatue;
+            ENABLED[InstancedBlockEntityManager.OptKind.SHELF]     = ConfigCache.optimizeShelves;
+            ENABLED[InstancedBlockEntityManager.OptKind.CAMPFIRE]     = ConfigCache.optimizeCampfire;
 
             ENABLED[InstancedBlockEntityManager.OptKind.NONE] = false;
         }

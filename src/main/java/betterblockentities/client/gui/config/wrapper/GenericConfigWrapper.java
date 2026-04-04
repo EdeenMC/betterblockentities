@@ -10,8 +10,8 @@ public class GenericConfigWrapper {
     public GenericConfigWrapper() { }
 
     public static class MainStorage {
-        private static boolean getGenericBooleanOption(String key) { return (boolean)BBE.CONFIG.MAIN.getOption(key).getValue(); }
-        private static int getGenericIntegerOption(String key) {return (int)BBE.CONFIG.MAIN.getOption(key).getValue();}
+        private static boolean getGenericBooleanOption(String key) { return (boolean)BBE.GlobalScope.CONFIG.MAIN.getOption(key).getValue(); }
+        private static int getGenericIntegerOption(String key) {return (int)BBE.GlobalScope.CONFIG.MAIN.getOption(key).getValue();}
 
         public static boolean master() { return getGenericBooleanOption("optimize.master"); }
         public static boolean optimizeChests() {return getGenericBooleanOption("optimize.chest");}
@@ -22,6 +22,8 @@ public class GenericConfigWrapper {
         public static boolean optimizeBell() { return getGenericBooleanOption("optimize.bell"); }
         public static boolean optimizeBed() {return getGenericBooleanOption("optimize.bed");}
         public static boolean optimizeCopperGolemStatue() {return getGenericBooleanOption("optimize.copper_golem_statue");}
+        public static boolean optimizeShelf() {return getGenericBooleanOption("optimize.shelf");}
+        public static boolean optimizeCampfire() {return getGenericBooleanOption("optimize.campfire");}
         public static boolean animateChest() {return getGenericBooleanOption("animation.chest");}
         public static boolean animateShulker() {return getGenericBooleanOption("animation.shulker");}
         public static boolean animateBell() {return getGenericBooleanOption("animation.bell");}
@@ -36,8 +38,8 @@ public class GenericConfigWrapper {
     }
 
     public static class HiddenStorage {
-        private static boolean getGenericBooleanOption(String key) { return (boolean)BBE.CONFIG.HIDDEN.getOption(key).getValue(); }
-        private static int getGenericIntegerOption(String key) {return (int)BBE.CONFIG.HIDDEN.getOption(key).getValue();}
+        private static boolean getGenericBooleanOption(String key) { return (boolean)BBE.GlobalScope.CONFIG.HIDDEN.getOption(key).getValue(); }
+        private static int getGenericIntegerOption(String key) {return (int)BBE.GlobalScope.CONFIG.HIDDEN.getOption(key).getValue();}
 
         public static boolean debugOverlays() {return getGenericBooleanOption("debug.overlays");}
     }

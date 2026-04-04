@@ -2,8 +2,8 @@ package betterblockentities.mixin.render.immediate.blockentity.decordatedpot;
 
 /* local */
 import betterblockentities.client.gui.config.ConfigCache;
-import betterblockentities.client.render.immediate.blockentity.BlockEntityExt;
-import betterblockentities.client.render.immediate.blockentity.InstancedBlockEntityManager;
+import betterblockentities.client.render.immediate.blockentity.extentions.BlockEntityExt;
+import betterblockentities.client.render.immediate.blockentity.manager.InstancedBlockEntityManager;
 
 /* minecraft */
 import net.minecraft.world.level.block.entity.BlockEntity;

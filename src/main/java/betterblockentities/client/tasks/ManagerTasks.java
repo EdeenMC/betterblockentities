@@ -1,11 +1,7 @@
 package betterblockentities.client.tasks;
 
-import betterblockentities.client.render.immediate.blockentity.InstancedBlockEntityManager;
+import betterblockentities.client.render.immediate.blockentity.manager.InstancedBlockEntityManager;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.IdentityHashMap;
-import java.util.PriorityQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**

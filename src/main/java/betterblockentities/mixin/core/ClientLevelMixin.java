@@ -1,7 +1,7 @@
 package betterblockentities.mixin.core;
 
 /* local */
-import betterblockentities.client.render.immediate.blockentity.LidControllerSync;
+import betterblockentities.client.render.immediate.blockentity.misc.LidControllerSync;
 
 /* minecraft */
 import net.minecraft.client.multiplayer.ClientLevel;

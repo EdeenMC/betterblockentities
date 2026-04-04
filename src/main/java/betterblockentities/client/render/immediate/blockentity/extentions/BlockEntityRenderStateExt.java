@@ -1,4 +1,4 @@
-package betterblockentities.client.render.immediate.blockentity;
+package betterblockentities.client.render.immediate.blockentity.extentions;
 
 /* minecraft */
 import net.minecraft.world.level.block.entity.BlockEntity;

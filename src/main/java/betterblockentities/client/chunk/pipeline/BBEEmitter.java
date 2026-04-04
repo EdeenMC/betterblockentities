@@ -1,6 +1,7 @@
 package betterblockentities.client.chunk.pipeline;
 
 /* local */
+import betterblockentities.api.render.AltRenderers;
 import betterblockentities.client.BBE;
 import betterblockentities.client.chunk.section.SectionUpdateDispatcher;
 import betterblockentities.client.chunk.util.QuadTransform;
@@ -9,8 +10,8 @@ import betterblockentities.client.gui.option.EnumTypes;
 import betterblockentities.client.model.geometry.GeometryRegistry;
 import betterblockentities.client.model.MaterialSelector;
 import betterblockentities.client.model.MultiPartBlockModel;
-import betterblockentities.client.render.immediate.blockentity.BlockEntityExt;
-import betterblockentities.client.render.immediate.blockentity.RenderingMode;
+import betterblockentities.client.render.immediate.blockentity.extentions.BlockEntityExt;
+import betterblockentities.client.render.immediate.blockentity.misc.RenderingMode;
 import betterblockentities.client.tasks.TaskScheduler;
 import betterblockentities.client.tasks.ResourceTasks;
 
@@ -21,11 +22,9 @@ import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
-import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.blockentity.state.ChestRenderState;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.sprite.SpriteId;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -472,11 +471,15 @@ public final class BBEEmitter {
 
     private static @Nullable BlockEntity tryGetBlockEntity(BlockPos pos, BlockAndTintGetter level, LevelSlice slice) {
         try {
-            return level.getBlockEntity(pos);
+            return AltRenderers.hasRendererOverride(
+                    level.getBlockEntity(pos).getType()) ?
+                    null : level.getBlockEntity(pos);
         } catch (Exception e) {
             BBE.getLogger().error("Failed to get block entity at {}. Attempting fallback.", pos, e);
             try {
-                return slice.getBlockEntity(pos);
+                return AltRenderers.hasRendererOverride(
+                        slice.getBlockEntity(pos).getType()) ?
+                        null : slice.getBlockEntity(pos);
             } catch (Throwable t) {
                 BBE.getLogger().error("Fallback failed! This block entity will be skipped and not added to this mesh!", t);
                 return null;
