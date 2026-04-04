@@ -192,27 +192,42 @@ public class BBEConfig {
      */
     public static void updateConfigCache() {
         ConfigCache.masterOptimize = GenericConfigWrapper.MainStorage.master();
-        ConfigCache.chestAnims = GenericConfigWrapper.MainStorage.animateChest();
-        ConfigCache.shulkerAnims = GenericConfigWrapper.MainStorage.animateShulker();
-        ConfigCache.bellAnims = GenericConfigWrapper.MainStorage.animateBell();
-        ConfigCache.potAnims = GenericConfigWrapper.MainStorage.animateDecoratedpot();
-        ConfigCache.signText = GenericConfigWrapper.MainStorage.signText();
-        ConfigCache.signTextRenderDistance = GenericConfigWrapper.MainStorage.signTextDistance();
-        ConfigCache.optimizeSigns = GenericConfigWrapper.MainStorage.optimizeSign();
-        ConfigCache.christmasChests = GenericConfigWrapper.MainStorage.useChristmasChestTextures();
-        ConfigCache.optimizeChests = GenericConfigWrapper.MainStorage.optimizeChests();
-        ConfigCache.optimizeDecoratedPots = GenericConfigWrapper.MainStorage.optimizeDecoratedPot();
-        ConfigCache.optimizeBeds = GenericConfigWrapper.MainStorage.optimizeBed();
-        ConfigCache.optimizeShulker = GenericConfigWrapper.MainStorage.optimizeShulker();
-        ConfigCache.bannerGraphics = GenericConfigWrapper.MainStorage.bannerGraphics();
-        ConfigCache.optimizeBells = GenericConfigWrapper.MainStorage.optimizeBell();
-        ConfigCache.optimizeBanners = GenericConfigWrapper.MainStorage.optimizeBanner();
-        ConfigCache.bannerPose = GenericConfigWrapper.MainStorage.bannerPose();
-        ConfigCache.optimizeCopperGolemStatue = GenericConfigWrapper.MainStorage.optimizeCopperGolemStatue();
-        ConfigCache.updateType = BBE.LoadedModList.EMF ? EnumTypes.UpdateSchedulerType.SMART.ordinal() : GenericConfigWrapper.MainStorage.updateScheduler();
-        ConfigCache.signTextCulling = GenericConfigWrapper.MainStorage.signTextCulling();
-        ConfigCache.optimizeShelves = GenericConfigWrapper.MainStorage.optimizeShelf();
-        ConfigCache.optimizeCampfire = GenericConfigWrapper.MainStorage.optimizeCampfire();
+
+        if (ConfigCache.masterOptimize) {
+            ConfigCache.chestAnims = GenericConfigWrapper.MainStorage.animateChest();
+            ConfigCache.shulkerAnims = GenericConfigWrapper.MainStorage.animateShulker();
+            ConfigCache.bellAnims = GenericConfigWrapper.MainStorage.animateBell();
+            ConfigCache.potAnims = GenericConfigWrapper.MainStorage.animateDecoratedpot();
+            ConfigCache.signText = GenericConfigWrapper.MainStorage.signText();
+            ConfigCache.signTextRenderDistance = GenericConfigWrapper.MainStorage.signTextDistance();
+            ConfigCache.optimizeSigns = GenericConfigWrapper.MainStorage.optimizeSign();
+            ConfigCache.christmasChests = GenericConfigWrapper.MainStorage.useChristmasChestTextures();
+            ConfigCache.optimizeChests = GenericConfigWrapper.MainStorage.optimizeChests();
+            ConfigCache.optimizeDecoratedPots = GenericConfigWrapper.MainStorage.optimizeDecoratedPot();
+            ConfigCache.optimizeBeds = GenericConfigWrapper.MainStorage.optimizeBed();
+            ConfigCache.optimizeShulker = GenericConfigWrapper.MainStorage.optimizeShulker();
+            ConfigCache.bannerGraphics = GenericConfigWrapper.MainStorage.bannerGraphics();
+            ConfigCache.optimizeBells = GenericConfigWrapper.MainStorage.optimizeBell();
+            ConfigCache.optimizeBanners = GenericConfigWrapper.MainStorage.optimizeBanner();
+            ConfigCache.bannerPose = GenericConfigWrapper.MainStorage.bannerPose();
+            ConfigCache.optimizeCopperGolemStatue = GenericConfigWrapper.MainStorage.optimizeCopperGolemStatue();
+            ConfigCache.updateType = BBE.LoadedModList.EMF ? EnumTypes.UpdateSchedulerType.SMART.ordinal() : GenericConfigWrapper.MainStorage.updateScheduler();
+            ConfigCache.signTextCulling = GenericConfigWrapper.MainStorage.signTextCulling();
+            ConfigCache.optimizeShelves = GenericConfigWrapper.MainStorage.optimizeShelf();
+            ConfigCache.optimizeCampfire = GenericConfigWrapper.MainStorage.optimizeCampfire();
+        }
+        else {
+            ConfigCache.optimizeSigns = false;
+            ConfigCache.optimizeChests = false;
+            ConfigCache.optimizeDecoratedPots = false;
+            ConfigCache.optimizeBeds = false;
+            ConfigCache.optimizeShulker = false;
+            ConfigCache.optimizeBells = false;
+            ConfigCache.optimizeBanners = false;
+            ConfigCache.optimizeCopperGolemStatue = false;
+            ConfigCache.optimizeShelves = false;
+            ConfigCache.optimizeCampfire = false;
+        }
 
         OptEnabledTable.rebuildFromConfig();
     }

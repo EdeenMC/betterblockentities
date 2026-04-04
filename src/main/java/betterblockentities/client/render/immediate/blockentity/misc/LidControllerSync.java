@@ -21,7 +21,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class LidControllerSync {
     public static void sync(ClientLevel clientLevel, BlockPos blockPos, BlockState blockState) {
-        if (!ConfigCache.masterOptimize || !ConfigCache.optimizeChests || !ConfigCache.chestAnims || !clientLevel.isClientSide())
+        if (!ConfigCache.optimizeChests || !ConfigCache.chestAnims || !clientLevel.isClientSide())
             return;
 
         final Block block = blockState.getBlock();

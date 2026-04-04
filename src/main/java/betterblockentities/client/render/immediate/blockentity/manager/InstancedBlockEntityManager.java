@@ -111,8 +111,7 @@ public final class InstancedBlockEntityManager {
      *   FINISHED   -> safe to remove from queue
      */
     public int run() {
-        if (!ConfigCache.masterOptimize
-                || !ext.supportedBlockEntity()
+        if (!ext.supportedBlockEntity()
                 || !BBEConfig.OptEnabledTable.ENABLED[ext.optKind() & 0xFF]
                 || AltRenderers.hasRendererOverride(blockEntity.getType())) {
             phase = Phase.IDLE;
@@ -222,7 +221,7 @@ public final class InstancedBlockEntityManager {
 
         SectionUpdateDispatcher.queueRebuildAtBlockPos(pos, () -> {
             /* when fence fires, we must potentially resume immediately */
-            if (!ConfigCache.masterOptimize || !BBEConfig.OptEnabledTable.ENABLED[ext.optKind() & 0xFF]) {
+            if (!BBEConfig.OptEnabledTable.ENABLED[ext.optKind() & 0xFF]) {
                 ext.terrainMeshReady(true);
                 phase = Phase.IDLE;
                 return;

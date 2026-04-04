@@ -28,9 +28,6 @@ public class BlockEntityRenderersMixin {
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Inject(method = "createEntityRenderers", at = @At("HEAD"))
     private static void replaceVanillaRenderers(CallbackInfoReturnable<Map<BlockEntityType<?>, BlockEntityRenderer<?, ?>>> cir) {
-
-        //take ConfigCache.masterOptimize into account
-
         if (AltRenderers.hasRendererOverride(BlockEntityType.SIGN)) {
             removeRegistration(BlockEntityType.SIGN);
         } else {

@@ -71,16 +71,14 @@ public abstract class SodiumWorldRendererMixin {
         }
 
         /* manage this block entity if optimizations for it is turned on */
-        if (ConfigCache.masterOptimize) {
-            BlockEntityExt ext = (BlockEntityExt) blockEntity;
+        BlockEntityExt ext = (BlockEntityExt) blockEntity;
 
-            if (ext.supportedBlockEntity() && BBEConfig.OptEnabledTable.ENABLED[ext.optKind() & 0xFF]
-                    && ext.terrainMeshReady() && !OverlayRenderer.isBreaking(blockEntity.getBlockPos().asLong(), progression)) {
+        if (ext.supportedBlockEntity() && BBEConfig.OptEnabledTable.ENABLED[ext.optKind() & 0xFF]
+                && ext.terrainMeshReady() && !OverlayRenderer.isBreaking(blockEntity.getBlockPos().asLong(), progression)) {
 
-                boolean cancel = !ext.hasSpecialManager() || !SpecialBlockEntityManager.shouldRender(blockEntity);
-                if (cancel) {
-                    return;
-                }
+            boolean cancel = !ext.hasSpecialManager() || !SpecialBlockEntityManager.shouldRender(blockEntity);
+            if (cancel) {
+                return;
             }
         }
 

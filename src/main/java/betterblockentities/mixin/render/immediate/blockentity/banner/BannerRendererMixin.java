@@ -52,7 +52,7 @@ public abstract class BannerRendererMixin {
 
     @Redirect(method = "submitBanner(Lnet/minecraft/client/resources/model/sprite/SpriteGetter;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;IILnet/minecraft/client/model/object/banner/BannerModel;Lnet/minecraft/client/model/object/banner/BannerFlagModel;FLnet/minecraft/world/item/DyeColor;Lnet/minecraft/world/level/block/entity/BannerPatternLayers;Lnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;I)V", at = @At(value = "INVOKE", target = "net/minecraft/client/renderer/SubmitNodeCollector.submitModel (Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lcom/mojang/blaze3d/vertex/PoseStack;IIILnet/minecraft/client/resources/model/sprite/SpriteId;Lnet/minecraft/client/resources/model/sprite/SpriteGetter;ILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V"))
     private static <S> void manageSubmitBase(SubmitNodeCollector collector, Model<S> model, S state, PoseStack poseStack, int light, int overlayCoords, int tint, SpriteId spriteId, SpriteGetter spriteGetter, int i4, ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
-        if (!ConfigCache.optimizeBanners || !ConfigCache.masterOptimize) {
+        if (!ConfigCache.optimizeBanners) {
             collector.submitModel(model, state, poseStack, light, overlayCoords, tint, spriteId, spriteGetter, i4, crumblingOverlay);
             return;
         }
@@ -67,7 +67,7 @@ public abstract class BannerRendererMixin {
 
     @Redirect(method = "submitBanner(Lnet/minecraft/client/resources/model/sprite/SpriteGetter;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;IILnet/minecraft/client/model/object/banner/BannerModel;Lnet/minecraft/client/model/object/banner/BannerFlagModel;FLnet/minecraft/world/item/DyeColor;Lnet/minecraft/world/level/block/entity/BannerPatternLayers;Lnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;I)V", at = @At(value = "INVOKE", target = "net/minecraft/client/renderer/blockentity/BannerRenderer.submitPatterns (Lnet/minecraft/client/resources/model/sprite/SpriteGetter;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;IILnet/minecraft/client/model/Model;Ljava/lang/Object;ZLnet/minecraft/world/item/DyeColor;Lnet/minecraft/world/level/block/entity/BannerPatternLayers;Lnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V"))
     private static <S> void manageSubmitCanvas(SpriteGetter spriteGetter, PoseStack poseStack, SubmitNodeCollector collector, int light, int overlayCoords, Model<S> model, S state, boolean bl, DyeColor dyeColor, BannerPatternLayers bannerPatternLayers, ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
-        if (!ConfigCache.optimizeBanners || !ConfigCache.masterOptimize) {
+        if (!ConfigCache.optimizeBanners) {
             BannerRendererAccessor.invokeSubmitPatterns(spriteGetter, poseStack, collector, light, overlayCoords, model, state, bl, dyeColor, bannerPatternLayers, crumblingOverlay);
             return;
         }
