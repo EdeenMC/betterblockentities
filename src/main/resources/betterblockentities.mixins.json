@@ -18,7 +18,6 @@
     "render.immediate.blockentity.BlockEntityRenderersMixin",
     "render.immediate.blockentity.banner.BannerBlockEntityMixin",
     "render.immediate.blockentity.banner.BannerRendererAccessor",
-    "render.immediate.blockentity.banner.BannerRendererMixin",
     "render.immediate.blockentity.bed.BedBlockEntityMixin",
     "render.immediate.blockentity.bell.BellBlockEntityMixin",
     "render.immediate.blockentity.campfire.CampfireBlockEntityMixin",
