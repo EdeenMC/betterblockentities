@@ -1,8 +1,11 @@
-# Used when building external pull requests
-# We don't want to publish build artifacts or expose our other caches to possibly untrusted code
-name: build-pull-request
+# Used when a commit is pushed to the repository
+# This makes use of caching for faster builds and uploads the resulting artifacts
+name: build-commit-nopublish
 
-on: [ pull_request ]
+on:
+  push:
+    branches-ignore:
+      - main
 
 jobs:
   build:
@@ -27,7 +30,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
         with:
-          cache-read-only: true
+          cache-read-only: false
 
       - name: Execute Gradle build
         run: ./gradlew build

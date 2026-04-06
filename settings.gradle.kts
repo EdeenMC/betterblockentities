@@ -1,14 +1,11 @@
-rootProject.name = "betterblockentities"
+rootProject.name = "bbe"
+
 pluginManagement {
     repositories {
-        maven(
-            "https://maven.fabricmc.net/") {
-            name = "Fabric"
-        }
+        mavenLocal()
+        maven { url = uri("https://maven.fabricmc.net/") }
         gradlePluginPortal()
-        mavenCentral()
-    }
-    plugins {
-        id( "net.fabricmc.fabric-loom" ) version providers.gradleProperty( "loom_version" ).get()
     }
 }
+
+include("fabric")

@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "id": "betterblockentities",
+  "version": "${version}",
+
+  "name": "BBE",
+  "description": "Optimize and customize block entity rendering with a more modern approach.",
+  "authors": [
+    "ceeden"
+  ],
+  "contact": {
+    "homepage": "https://github.com/ceeden/betterblockentities",
+    "issues": "https://github.com/ceeden/betterblockentities/issues",
+    "sources": "https://github.com/ceeden/betterblockentities"
+  },
+
+  "license": "LGPLv3",
+  "icon": "assets/betterblockentities/icon.png",
+
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "betterblockentities.client.BBE"
+    ],
+    "sodium:config_api_user": [
+      "betterblockentities.client.gui.config.builder.SodiumConfigBuilder"
+    ]
+  },
+  "mixins": [
+    "betterblockentities.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.7",
+    "minecraft": ">=26.1",
+    "sodium": ">=0.8.7"
+  },
+  "breaks": {
+    "optifabric": "*"
+  },
+  "custom": {
+
+  }
+}
