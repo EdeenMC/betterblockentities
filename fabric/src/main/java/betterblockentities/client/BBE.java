@@ -9,6 +9,7 @@ import betterblockentities.client.gui.config.wrapper.GenericConfigWrapper;
 import betterblockentities.mixin.gui.DebugScreenEntriesAccessor;
 
 /* fabric */
+import com.google.common.collect.ImmutableList;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 
@@ -30,7 +31,7 @@ public class BBE implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         getLogger().info("Checking for loaded mods for compact...");
-        LoadedModList.checkForLoadedMods();
+        ModCompact.checkForLoadedMods();
 
         getLogger().info("Building config cache from user defined config file...");
         BBEConfig.updateConfigCache();
@@ -55,22 +56,48 @@ public class BBE implements ClientModInitializer {
         public static Frustum frustum;
         public static AltRenderDispatcher altRenderDispatcher;
         public static List<BlockEntityRenderState> altBlockEntityRenderStates = new ArrayList<>();
+        public static boolean limitVanillaSignRendering = false;
     }
 
-    public static class LoadedModList {
-        public static boolean EMF = false;
-        public static boolean NVIDIUM = false;
+
+    public static class ModCompact {
+        private static ImmutableList<String> modList = ImmutableList.of(
+                "entity_model_features",
+                "litematica",
+                "malilib"
+        );
+
+        private static ImmutableList<String> loadedMods;
 
         public static void checkForLoadedMods() {
-            if (FabricLoader.getInstance().isModLoaded("entity_model_features") &&
-                    !((boolean)GlobalScope.CONFIG.HIDDEN.getOption("override.forced_updatescheduler").getValue())) {
-                EMF = true;
+            ImmutableList.Builder<String> builder = new ImmutableList.Builder<>();
+
+            for (String id : modList) {
+                if (isFabricModLoaded(id)) {
+                    builder.add(id);
+                }
             }
-            if (FabricLoader.getInstance().isModLoaded("nvidium")) {
-                NVIDIUM = true;
+            loadedMods = builder.build();
+        }
+
+        public static boolean isSchedulerOptionLimited() {
+            boolean schedulerOverride = (boolean)GlobalScope.CONFIG.HIDDEN.getOption("override.forced_updatescheduler").getValue();
+
+            if (!loadedMods.isEmpty() && !schedulerOverride) {
+                return true;
             }
+            return false;
+        }
+
+        public static boolean isModLoaded(String id) {
+            return loadedMods.contains(id);
+        }
+
+        private static boolean isFabricModLoaded(String id) {
+            return FabricLoader.getInstance().isModLoaded(id);
         }
     }
+
 
     /* global logger, used for info logging, error handling, etc... */
     public static Logger getLogger() {

@@ -35,8 +35,18 @@ public class LevelRendererMixin {
         BBE.GlobalScope.altRenderDispatcher.prepare(camera.position());
     }
 
-    @Inject(at = @At("TAIL"), method = "submitBlockEntities")
+    @Inject(at = @At("HEAD"), method = "submitBlockEntities")
+    private void updateSignRenderState(CallbackInfo ci) {
+        BBE.GlobalScope.limitVanillaSignRendering = true;
+    }
+
+    /*
+     *  give ourselves a lower priority so we can make sure this executes before any other mixins here
+    */
+    @Inject(method = "submitBlockEntities", at = @At("RETURN"), order = 900)
     private void submitAltRenderers(PoseStack poseStack, LevelRenderState levelRenderState, SubmitNodeStorage submitNodeStorage, CallbackInfo ci) {
+        BBE.GlobalScope.limitVanillaSignRendering = false;
+
         Vec3 cameraPos = levelRenderState.cameraRenderState.pos;
         double camX = cameraPos.x();
         double camY = cameraPos.y();
@@ -46,7 +56,9 @@ public class LevelRendererMixin {
             BlockPos blockPos = renderState.blockPos;
             poseStack.pushPose();
             poseStack.translate(blockPos.getX() - camX, blockPos.getY() - camY, blockPos.getZ() - camZ);
-            BBE.GlobalScope.altRenderDispatcher.submit(renderState, poseStack, submitNodeStorage, levelRenderState.cameraRenderState);
+            BBE.GlobalScope.altRenderDispatcher.submit(
+                    renderState, poseStack, submitNodeStorage, levelRenderState.cameraRenderState
+            );
             poseStack.popPose();
         }
     }

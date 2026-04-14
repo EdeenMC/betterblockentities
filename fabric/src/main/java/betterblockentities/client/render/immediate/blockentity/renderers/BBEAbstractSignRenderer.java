@@ -1,6 +1,7 @@
 package betterblockentities.client.render.immediate.blockentity.renderers;
 
 /* local */
+import betterblockentities.client.BBE;
 import betterblockentities.client.gui.config.ConfigCache;
 import betterblockentities.client.render.immediate.OverlayRenderer;
 import betterblockentities.mixin.render.immediate.blockentity.BlockEntityRenderStateAccessor;
@@ -17,6 +18,7 @@ import net.minecraft.client.renderer.blockentity.state.SignRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.resources.model.sprite.SpriteGetter;
 import net.minecraft.client.resources.model.sprite.SpriteId;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -37,6 +39,7 @@ import net.minecraft.world.phys.Vec3;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 /* mixin */
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Unique;
 
 /* java/misc */
@@ -46,9 +49,11 @@ public abstract class BBEAbstractSignRenderer<S extends SignRenderState> impleme
     private static final int BLACK_TEXT_OUTLINE_COLOR = -988212;
     private static final int OUTLINE_RENDER_DISTANCE = Mth.square(16);
     private final Font font;
+    private final SpriteGetter sprites;
 
     public BBEAbstractSignRenderer(final BlockEntityRendererProvider.Context context) {
         this.font = context.font();
+        this.sprites = context.sprites();
     }
 
     protected abstract Model.Simple getSignModel(S state);
@@ -59,8 +64,22 @@ public abstract class BBEAbstractSignRenderer<S extends SignRenderState> impleme
         final BlockState bs = ((BlockEntityRenderStateAccessor)state).getBlockState();
         final SignBlock signBlock = (SignBlock)bs.getBlock();
 
+        if (!BBE.GlobalScope.limitVanillaSignRendering) {
+            Model.Simple bodyModel = this.getSignModel(state);
+
+            poseStack.pushPose();
+            poseStack.mulPose(state.transformations.body());
+            this.submitSign(poseStack, state.lightCoords, signBlock.type(), bodyModel, state.breakProgress, submitNodeCollector);
+            poseStack.popPose();
+        }
         manageCrumblingOverlay(state, poseStack);
         renderCulledText(state, cameraRenderState, bs, signBlock, poseStack, submitNodeCollector);
+    }
+
+    @Unique
+    protected void submitSign(final PoseStack poseStack, final int lightCoords, final WoodType type, final Model.Simple signModel, final ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress, final SubmitNodeCollector submitNodeCollector) {
+        SpriteId sprite = this.getSignSprite(type);
+        submitNodeCollector.submitModel(signModel, Unit.INSTANCE, poseStack, lightCoords, OverlayTexture.NO_OVERLAY, -1, sprite, this.sprites, 0, breakProgress);
     }
 
     private void manageCrumblingOverlay(S state, PoseStack poseStack) {

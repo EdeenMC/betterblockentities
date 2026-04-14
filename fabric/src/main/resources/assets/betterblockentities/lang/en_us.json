@@ -66,7 +66,7 @@
 
   "bbe.config.storage.main.misc.update_scheduler" : "Update Scheduler",
   "bbe.config.storage.main.misc.update_scheduler.tooltip" : "Decides what update scheduler to use, Smart updates block-entities based on several factors like visibility (no direct updates) while Fast updates immediately",
-  "bbe.config.storage.main.misc.update_scheduler.tooltip_notavailable" : "This option is not available because the EMF mod is loaded!",
+  "bbe.config.storage.main.misc.update_scheduler.tooltip_notavailable" : "This option is not available because an incompatible mod was detected!",
 
   "bbe.config.storage.main.misc.update_scheduler.type.fast" : "Fast",
   "bbe.config.storage.main.misc.update_scheduler.type.smart" : "Smart",
