@@ -78,7 +78,7 @@ Example:
   "entrypoints": {
     // ... other entrypoints
 
-    "bbe_alt_renderers": [
+    "bbe:renderer_registration_api": [
       "com.example.examplemod.compact.BBEEntryPoint" //your entrypoint class
     ]
   }
