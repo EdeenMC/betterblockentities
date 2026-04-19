@@ -4,13 +4,13 @@ package betterblockentities.mixin.sodium.pipeline;
 import betterblockentities.client.chunk.pipeline.BBEEmitter;
 
 /* minecraft */
-import net.minecraft.client.renderer.block.BlockAndTintGetter;
-import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.TriState;
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 
 /* sodium */
@@ -36,12 +36,23 @@ import java.util.function.Predicate;
 public abstract class BlockRendererMixin extends AbstractBlockRenderContext {
     @Shadow protected abstract void tintQuad(MutableQuadViewImpl quad);
     @Shadow protected abstract void bufferQuad(MutableQuadViewImpl quad, float[] brightnesses, Material material);
-    
+
     @Redirect(
-            method = "renderModel(Lnet/minecraft/client/renderer/block/dispatch/BlockStateModel;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/BlockPos;)V",
+            method = "renderModel(Lnet/minecraft/client/renderer/block/model/BlockStateModel;" +
+                    "Lnet/minecraft/world/level/block/state/BlockState;" +
+                    "Lnet/minecraft/core/BlockPos;" +
+                    "Lnet/minecraft/core/BlockPos;)V",
             at = @At(
                     value = "INVOKE",
-                    target = "net/caffeinemc/mods/sodium/client/services/PlatformModelEmitter.emitModel (Lnet/minecraft/client/renderer/block/dispatch/BlockStateModel;Ljava/util/function/Predicate;Lnet/caffeinemc/mods/sodium/client/render/model/MutableQuadViewImpl;Lnet/minecraft/util/RandomSource;Lnet/minecraft/client/renderer/block/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/caffeinemc/mods/sodium/client/services/PlatformModelEmitter$Bufferer;)V"
+                    target = "Lnet/caffeinemc/mods/sodium/client/services/PlatformModelEmitter;" +
+                            "emitModel(Lnet/minecraft/client/renderer/block/model/BlockStateModel;" +
+                            "Ljava/util/function/Predicate;" +
+                            "Lnet/caffeinemc/mods/sodium/client/render/model/MutableQuadViewImpl;" +
+                            "Lnet/minecraft/util/RandomSource;" +
+                            "Lnet/minecraft/world/level/BlockAndTintGetter;" +
+                            "Lnet/minecraft/core/BlockPos;" +
+                            "Lnet/minecraft/world/level/block/state/BlockState;" +
+                            "Lnet/caffeinemc/mods/sodium/client/services/PlatformModelEmitter$Bufferer;)V"
             )
     )
     public void emitModel(PlatformModelEmitter instance, BlockStateModel model, Predicate<Direction> isFaceCulled, MutableQuadViewImpl emitter, RandomSource random, BlockAndTintGetter level, BlockPos pos, BlockState state, PlatformModelEmitter.Bufferer bufferer) {
@@ -62,7 +73,7 @@ public abstract class BlockRendererMixin extends AbstractBlockRenderContext {
         boolean emissive = quad.emissive();
         ChunkSectionLayer blendMode = quad.getRenderType();
 
-        Material material = DefaultMaterials.forChunkLayer(this.forceOpaque ? ChunkSectionLayer.SOLID : blendMode);
+        Material material = DefaultMaterials.forChunkLayer(blendMode == null ? this.defaultRenderType : blendMode);
 
         this.tintQuad(quad);
         this.shadeQuad(quad, lightMode, emissive, shadeMode);

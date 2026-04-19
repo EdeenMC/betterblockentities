@@ -32,7 +32,7 @@ public class BlockEntityRenderersMixin {
             removeRegistration(BlockEntityType.SIGN);
         } else {
             BlockEntityRendererProvider r0 =
-                    ConfigCache.optimizeSigns ? BBEStandingSignRenderer::new : StandingSignRenderer::new;
+                    ConfigCache.optimizeSigns ? BBEStandingSignRenderer::new : SignRenderer::new;
             BlockEntityRenderersAccessor.invokeRegister(BlockEntityType.SIGN, r0);
         }
 

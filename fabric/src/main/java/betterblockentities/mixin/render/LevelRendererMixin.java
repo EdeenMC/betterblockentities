@@ -4,13 +4,15 @@ package betterblockentities.mixin.render;
 import betterblockentities.client.BBE;
 
 /* minecraft */
+import com.mojang.blaze3d.buffers.GpuBufferSlice;
+import com.mojang.blaze3d.resource.GraphicsResourceAllocator;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.culling.Frustum;
-import net.minecraft.client.renderer.state.level.LevelRenderState;
+import net.minecraft.client.renderer.state.LevelRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
 
@@ -18,6 +20,8 @@ import net.minecraft.world.phys.Vec3;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 /* mixin */
+import org.joml.Matrix4f;
+import org.joml.Vector4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -30,8 +34,8 @@ public class LevelRendererMixin {
         BBE.GlobalScope.frustum = frustum;
     }
 
-    @Inject(at = @At("HEAD"), method = "extractLevel")
-    private void updateAltRenderDispatcher(DeltaTracker deltaTracker, Camera camera, float deltaPartialTick, CallbackInfo ci) {
+    @Inject(at = @At("HEAD"), method = "renderLevel")
+    private void updateAltRenderDispatcher(GraphicsResourceAllocator graphicsResourceAllocator, DeltaTracker deltaTracker, boolean bl, Camera camera, Matrix4f matrix4f, Matrix4f matrix4f2, Matrix4f matrix4f3, GpuBufferSlice gpuBufferSlice, Vector4f vector4f, boolean bl2, CallbackInfo ci) {
         BBE.GlobalScope.altRenderDispatcher.prepare(camera.position());
     }
 

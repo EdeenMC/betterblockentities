@@ -15,15 +15,15 @@ import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.blockentity.WallAndGroundTransformations;
 import net.minecraft.client.renderer.blockentity.state.BannerRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.sprite.SpriteGetter;
-import net.minecraft.client.resources.model.sprite.SpriteId;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.MaterialSet;
+import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Unit;
@@ -45,210 +45,120 @@ import com.mojang.math.Transformation;
 import java.util.function.Consumer;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import org.jspecify.annotations.Nullable;
 
 public class BBEBannerRenderer implements BlockEntityRenderer<BannerBlockEntity, BannerRenderState> {
     private static final int MAX_PATTERNS = 16;
     private static final float SIZE = 0.6666667F;
-    private static final Vector3fc MODEL_SCALE = new Vector3f(0.6666667F, -0.6666667F, -0.6666667F);
-    private static final Vector3fc MODEL_TRANSLATION = new Vector3f(0.5F, 0.0F, 0.5F);
-    public static final WallAndGroundTransformations<Transformation> TRANSFORMATIONS = new WallAndGroundTransformations<>(
-            BBEBannerRenderer::createWallTransformation, BBEBannerRenderer::createGroundTransformation, 16
-    );
-    private final SpriteGetter sprites;
+    private final MaterialSet materials;
     private final BannerModel standingModel;
     private final BannerModel wallModel;
     private final BannerFlagModel standingFlagModel;
     private final BannerFlagModel wallFlagModel;
 
-    public BBEBannerRenderer(final BlockEntityRendererProvider.Context context) {
-        this(context.entityModelSet(), context.sprites());
+    public BBEBannerRenderer(BlockEntityRendererProvider.Context context) {
+        this(context.entityModelSet(), context.materials());
     }
 
-    public BBEBannerRenderer(final SpecialModelRenderer.BakingContext context) {
-        this(context.entityModelSet(), context.sprites());
+    public BBEBannerRenderer(SpecialModelRenderer.BakingContext bakingContext) {
+        this(bakingContext.entityModelSet(), bakingContext.materials());
     }
 
-    public BBEBannerRenderer(final EntityModelSet modelSet, final SpriteGetter sprites) {
-        this.sprites = sprites;
-        this.standingModel = new BannerModel(modelSet.bakeLayer(ModelLayers.STANDING_BANNER));
-        this.wallModel = new BannerModel(modelSet.bakeLayer(ModelLayers.WALL_BANNER));
-        this.standingFlagModel = new BannerFlagModel(modelSet.bakeLayer(ModelLayers.STANDING_BANNER_FLAG));
-        this.wallFlagModel = new BannerFlagModel(modelSet.bakeLayer(ModelLayers.WALL_BANNER_FLAG));
+    public BBEBannerRenderer(EntityModelSet entityModelSet, MaterialSet materialSet) {
+        this.materials = materialSet;
+        this.standingModel = new BannerModel(entityModelSet.bakeLayer(ModelLayers.STANDING_BANNER));
+        this.wallModel = new BannerModel(entityModelSet.bakeLayer(ModelLayers.WALL_BANNER));
+        this.standingFlagModel = new BannerFlagModel(entityModelSet.bakeLayer(ModelLayers.STANDING_BANNER_FLAG));
+        this.wallFlagModel = new BannerFlagModel(entityModelSet.bakeLayer(ModelLayers.WALL_BANNER_FLAG));
     }
 
     public BannerRenderState createRenderState() {
         return new BannerRenderState();
     }
 
-    public void extractRenderState(
-            final BannerBlockEntity blockEntity,
-            final BannerRenderState state,
-            final float partialTicks,
-            final Vec3 cameraPosition,
-            final ModelFeatureRenderer.CrumblingOverlay breakProgress
-    ) {
-        BlockEntityRenderer.super.extractRenderState(blockEntity, state, partialTicks, cameraPosition, breakProgress);
-        state.baseColor = blockEntity.getBaseColor();
-        state.patterns = blockEntity.getPatterns();
-        BlockState blockState = blockEntity.getBlockState();
+    public void extractRenderState(BannerBlockEntity bannerBlockEntity, BannerRenderState bannerRenderState, float f, Vec3 vec3, ModelFeatureRenderer.@Nullable CrumblingOverlay crumblingOverlay) {
+        BlockEntityRenderer.super.extractRenderState(bannerBlockEntity, bannerRenderState, f, vec3, crumblingOverlay);
+        bannerRenderState.baseColor = bannerBlockEntity.getBaseColor();
+        bannerRenderState.patterns = bannerBlockEntity.getPatterns();
+        BlockState blockState = bannerBlockEntity.getBlockState();
         if (blockState.getBlock() instanceof BannerBlock) {
-            state.transformation = TRANSFORMATIONS.freeTransformations((Integer)blockState.getValue(BannerBlock.ROTATION));
-            state.attachmentType = BannerBlock.AttachmentType.GROUND;
+            bannerRenderState.angle = -RotationSegment.convertToDegrees((Integer)blockState.getValue(BannerBlock.ROTATION));
+            bannerRenderState.standing = true;
         } else {
-            state.transformation = TRANSFORMATIONS.wallTransformation(blockState.getValue(WallBannerBlock.FACING));
-            state.attachmentType = BannerBlock.AttachmentType.WALL;
+            bannerRenderState.angle = -((Direction)blockState.getValue(WallBannerBlock.FACING)).toYRot();
+            bannerRenderState.standing = false;
         }
 
-        long gameTime = blockEntity.getLevel() != null ? blockEntity.getLevel().getGameTime() : 0L;
-        BlockPos blockPos = blockEntity.getBlockPos();
-        state.phase = ((float)Math.floorMod(blockPos.getX() * 7 + blockPos.getY() * 9 + blockPos.getZ() * 13 + gameTime, 100L) + partialTicks) / 100.0F;
+        long l = bannerBlockEntity.getLevel() != null ? bannerBlockEntity.getLevel().getGameTime() : 0L;
+        BlockPos blockPos = bannerBlockEntity.getBlockPos();
+        bannerRenderState.phase = ((float)Math.floorMod((long)(blockPos.getX() * 7 + blockPos.getY() * 9 + blockPos.getZ() * 13) + l, 100L) + f) / 100.0F;
 
-
-        ((BlockEntityRenderStateExt)state).blockEntity(blockEntity);
+        ((BlockEntityRenderStateExt)bannerRenderState).blockEntity(bannerBlockEntity);
     }
 
-    private BannerModel bannerModel(final BannerBlock.AttachmentType type) {
-        return switch (type) {
-            case WALL -> this.wallModel;
-            case GROUND -> this.standingModel;
-        };
+    public void submit(BannerRenderState bannerRenderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState) {
+        BannerModel bannerModel;
+        BannerFlagModel bannerFlagModel;
+        if (bannerRenderState.standing) {
+            bannerModel = this.standingModel;
+            bannerFlagModel = this.standingFlagModel;
+        } else {
+            bannerModel = this.wallModel;
+            bannerFlagModel = this.wallFlagModel;
+        }
+
+        submitBanner(bannerRenderState, this.materials, poseStack, submitNodeCollector, bannerRenderState.lightCoords, OverlayTexture.NO_OVERLAY, bannerRenderState.angle, bannerModel, bannerFlagModel, bannerRenderState.phase, bannerRenderState.baseColor, bannerRenderState.patterns, bannerRenderState.breakProgress, 0);
     }
 
-    private BannerFlagModel flagModel(final BannerBlock.AttachmentType type) {
-        return switch (type) {
-            case WALL -> this.wallFlagModel;
-            case GROUND -> this.standingFlagModel;
-        };
-    }
-
-    public void submit(final BannerRenderState state, final PoseStack poseStack, final SubmitNodeCollector submitNodeCollector, final CameraRenderState camera) {
+    private static void submitBanner(BannerRenderState bannerRenderState, MaterialSet materialSet, PoseStack poseStack, SubmitNodeCollector collector, int i, int j, float f, BannerModel bannerModel, BannerFlagModel bannerFlagModel, float g, DyeColor dyeColor, BannerPatternLayers bannerPatternLayers, ModelFeatureRenderer.@Nullable CrumblingOverlay crumblingOverlay, int k) {
         poseStack.pushPose();
-        poseStack.mulPose(state.transformation);
+        poseStack.translate(0.5F, 0.0F, 0.5F);
+        poseStack.mulPose(Axis.YP.rotationDegrees(f));
+        poseStack.scale(0.6666667F, -0.6666667F, -0.6666667F);
 
-        submitBanner(
-                state,
-                this.sprites,
-                poseStack,
-                submitNodeCollector,
-                state.lightCoords,
-                OverlayTexture.NO_OVERLAY,
-                this.bannerModel(state.attachmentType),
-                this.flagModel(state.attachmentType),
-                state.phase,
-                state.baseColor,
-                state.patterns,
-                state.breakProgress,
-                0
-        );
-        poseStack.popPose();
-    }
+        Material material = ModelBakery.BANNER_BASE;
 
-    private static void submitBanner(
-            final BannerRenderState state,
-            final SpriteGetter sprites,
-            final PoseStack poseStack,
-            final SubmitNodeCollector collector,
-            final int lightCoords,
-            final int overlayCoords,
-            final BannerModel model,
-            final BannerFlagModel flagModel,
-            final float phase,
-            final DyeColor baseColor,
-            final BannerPatternLayers patterns,
-            final ModelFeatureRenderer.CrumblingOverlay breakProgress,
-            final int outlineColor
-    ) {
-        SpriteId sprite = Sheets.BANNER_BASE;
+        BlockEntityRenderStateExt stateExt = (BlockEntityRenderStateExt)bannerRenderState;
 
-        BlockEntityRenderStateExt stateExt = (BlockEntityRenderStateExt)state;
-
-        boolean managed = OverlayRenderer.manageCrumblingOverlay(stateExt.blockEntity(), poseStack, model, Unit.INSTANCE, lightCoords, overlayCoords, outlineColor, breakProgress);
+        boolean managed = OverlayRenderer.manageCrumblingOverlay(stateExt.blockEntity(), poseStack, bannerModel, Unit.INSTANCE, i, j, k, crumblingOverlay);
         if (!managed) {
-            collector.submitModel(model, Unit.INSTANCE, poseStack, lightCoords, overlayCoords, -1, sprite, sprites, outlineColor, breakProgress);
+            collector.submitModel(bannerModel, Unit.INSTANCE, poseStack, material.renderType(RenderTypes::entitySolid), i, j, -1, materialSet.get(material), k, crumblingOverlay);
         }
 
         float step = -0.45f;
         float rot = step * ConfigCache.bannerPose;
         float rotClamped = Math.clamp(rot, -4.05f, -0.45f);
-        flagModel.root().getChild("flag").xRot = (float)Math.toRadians(rotClamped);
+        bannerFlagModel.root().getChild("flag").xRot = (float)Math.toRadians(rotClamped);
 
-        boolean managed2 = OverlayRenderer.manageCrumblingOverlay(stateExt.blockEntity(), poseStack, flagModel, null, lightCoords, overlayCoords, outlineColor, breakProgress);
+        boolean managed2 = OverlayRenderer.manageCrumblingOverlay(stateExt.blockEntity(), poseStack, bannerFlagModel, null, i, j, k, crumblingOverlay);
         if (!managed2) {
-            collector.submitModel(flagModel, phase, poseStack, lightCoords, overlayCoords, -1, sprite, sprites, outlineColor, breakProgress);
+            collector.submitModel(bannerFlagModel, g, poseStack, material.renderType(RenderTypes::entitySolid), i, j, -1, materialSet.get(material), k, crumblingOverlay);
         }
 
         if (!managed && !managed2) {
-            submitPatterns(sprites, poseStack, collector, lightCoords, overlayCoords, flagModel, phase, true, baseColor, patterns, breakProgress);
+            submitPatterns(materialSet, poseStack, collector, i, j, bannerFlagModel, g, material, true, dyeColor, bannerPatternLayers, false, crumblingOverlay, k);
+        }
+
+        poseStack.popPose();
+    }
+
+    public static <S> void submitPatterns(MaterialSet materialSet, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int i, int j, Model<S> model, S object, Material material, boolean bl, DyeColor dyeColor, BannerPatternLayers bannerPatternLayers, boolean bl2, ModelFeatureRenderer.@Nullable CrumblingOverlay crumblingOverlay, int k) {
+        submitNodeCollector.submitModel(model, object, poseStack, material.renderType(RenderTypes::entitySolid), i, j, -1, materialSet.get(material), k, crumblingOverlay);
+        if (bl2) {
+            submitNodeCollector.submitModel(model, object, poseStack, RenderTypes.entityGlint(), i, j, -1, materialSet.get(material), 0, crumblingOverlay);
+        }
+
+        submitPatternLayer(materialSet, poseStack, submitNodeCollector, i, j, model, object, bl ? Sheets.BANNER_BASE : Sheets.SHIELD_BASE, dyeColor, crumblingOverlay);
+
+        for(int l = 0; l < 16 && l < bannerPatternLayers.layers().size(); ++l) {
+            BannerPatternLayers.Layer layer = (BannerPatternLayers.Layer)bannerPatternLayers.layers().get(l);
+            Material material2 = bl ? Sheets.getBannerMaterial(layer.pattern()) : Sheets.getShieldMaterial(layer.pattern());
+            submitPatternLayer(materialSet, poseStack, submitNodeCollector, i, j, model, object, material2, layer.color(), (ModelFeatureRenderer.CrumblingOverlay)null);
         }
     }
 
-    public static <S> void submitPatterns(
-            final SpriteGetter sprites,
-            final PoseStack poseStack,
-            final SubmitNodeCollector submitNodeCollector,
-            final int lightCoords,
-            final int overlayCoords,
-            final Model<S> model,
-            final S state,
-            final boolean banner,
-            final DyeColor baseColor,
-            final BannerPatternLayers patterns,
-            final ModelFeatureRenderer.CrumblingOverlay breakProgress
-    ) {
-        submitPatternLayer(
-                sprites,
-                poseStack,
-                submitNodeCollector,
-                lightCoords,
-                overlayCoords,
-                model,
-                state,
-                banner ? Sheets.BANNER_PATTERN_BASE : Sheets.SHIELD_PATTERN_BASE,
-                baseColor,
-                breakProgress
-        );
-
-        for (int maskIndex = 0; maskIndex < 16 && maskIndex < patterns.layers().size(); maskIndex++) {
-            BannerPatternLayers.Layer layer = (BannerPatternLayers.Layer)patterns.layers().get(maskIndex);
-            SpriteId sprite = banner ? Sheets.getBannerSprite(layer.pattern()) : Sheets.getShieldSprite(layer.pattern());
-            submitPatternLayer(sprites, poseStack, submitNodeCollector, lightCoords, overlayCoords, model, state, sprite, layer.color(), null);
-        }
-    }
-
-    private static <S> void submitPatternLayer(
-            final SpriteGetter sprites,
-            final PoseStack poseStack,
-            final SubmitNodeCollector submitNodeCollector,
-            final int lightCoords,
-            final int overlayCoords,
-            final Model<S> model,
-            final S state,
-            final SpriteId sprite,
-            final DyeColor color,
-            final ModelFeatureRenderer.CrumblingOverlay breakProgress
-    ) {
-        int diffuseColor = color.getTextureDiffuseColor();
-        submitNodeCollector.submitModel(
-                model, state, poseStack, sprite.renderType(RenderTypes::bannerPattern), lightCoords, overlayCoords, diffuseColor, sprites.get(sprite), 0, breakProgress
-        );
-    }
-
-    public void getExtents(final Consumer<Vector3fc> output) {
-        PoseStack poseStack = new PoseStack();
-        this.standingModel.root().getExtentsForGui(poseStack, output);
-        this.standingFlagModel.setupAnim(0.0F);
-        this.standingFlagModel.root().getExtentsForGui(poseStack, output);
-    }
-
-    private static Transformation modelTransformation(final float angle) {
-        return new Transformation(MODEL_TRANSLATION, Axis.YP.rotationDegrees(-angle), MODEL_SCALE, null);
-    }
-
-    private static Transformation createGroundTransformation(final int segment) {
-        return modelTransformation(RotationSegment.convertToDegrees(segment));
-    }
-
-    private static Transformation createWallTransformation(final Direction direction) {
-        return modelTransformation(direction.toYRot());
+    private static <S> void submitPatternLayer(MaterialSet materialSet, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int i, int j, Model<S> model, S object, Material material, DyeColor dyeColor, ModelFeatureRenderer.@Nullable CrumblingOverlay crumblingOverlay) {
+        int k = dyeColor.getTextureDiffuseColor();
+        submitNodeCollector.submitModel(model, object, poseStack, material.renderType(RenderTypes::entityNoOutline), i, j, k, materialSet.get(material), 0, crumblingOverlay);
     }
 }

@@ -32,7 +32,7 @@ import it.unimi.dsi.fastutil.ints.IntArrays;
 public class ModelFeatureRendererMixin {
     @Shadow @Final private PoseStack poseStack;
 
-    @Redirect(method = "renderTranslucent", at = @At(value = "INVOKE", target = "Ljava/util/List;sort(Ljava/util/Comparator;)V"))
+    @Redirect(method = "render(Lnet/minecraft/client/renderer/SubmitNodeCollection;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)V", at = @At(value = "INVOKE", target = "Ljava/util/List;sort(Ljava/util/Comparator;)V"))
     private void fastTranslucentSort(List<SubmitNodeStorage.TranslucentModelSubmit<?>> list, Comparator<?> comparator) {
         int size = list.size();
         if (size < 2)
@@ -60,7 +60,7 @@ public class ModelFeatureRendererMixin {
         list.addAll(sorted);
     }
 
-    @Inject(method = "renderSolid", at = @At("TAIL"))
+    @Inject(method = "render(Lnet/minecraft/client/renderer/SubmitNodeCollection;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)V", at = @At("TAIL"))
     public void addRenderers(SubmitNodeCollection submitNodeCollection, MultiBufferSource.BufferSource bufferSource, OutlineBufferSource outlineBufferSource, MultiBufferSource.BufferSource crumblingBufferSource, CallbackInfo ci) {
         OverlayRenderer.renderCrumblingOverlays(crumblingBufferSource, this.poseStack);
     }

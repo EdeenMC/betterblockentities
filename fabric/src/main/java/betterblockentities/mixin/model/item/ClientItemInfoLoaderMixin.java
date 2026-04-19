@@ -4,7 +4,6 @@ package betterblockentities.mixin.model.item;
 import betterblockentities.client.gui.config.ConfigCache;
 
 /* minecraft */
-import com.mojang.math.Transformation;
 import net.minecraft.client.renderer.item.ClientItem;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.SelectItemModel;
@@ -17,7 +16,6 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.SpecialDates;
 
 /* mixin */
-import net.minecraft.world.level.block.state.properties.ChestType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -40,7 +38,7 @@ public class ClientItemInfoLoaderMixin {
 
     @Inject(method = "scheduleLoad", at = @At("RETURN"), cancellable = true)
     private static void rewriteChestItemAssets(ResourceManager resourceManager, Executor executor,
-            CallbackInfoReturnable<CompletableFuture<ClientItemInfoLoader.LoadedClientInfos>> cir
+                                               CallbackInfoReturnable<CompletableFuture<ClientItemInfoLoader.LoadedClientInfos>> cir
     ) {
         if (!ShouldOverrideVanilla()) {
             return;
@@ -60,8 +58,8 @@ public class ClientItemInfoLoaderMixin {
     private static ClientItemInfoLoader.LoadedClientInfos rewriteChestItems(ClientItemInfoLoader.LoadedClientInfos loaded) {
         Map<Identifier, ClientItem> map = new HashMap<>(loaded.contents());
 
-        patchOne(map, CHEST_ITEM_ID, ChestSpecialRenderer.REGULAR.single());
-        patchOne(map, TRAPPED_CHEST_ITEM_ID, ChestSpecialRenderer.TRAPPED.single());
+        patchOne(map, CHEST_ITEM_ID, ChestSpecialRenderer.NORMAL_CHEST_TEXTURE);
+        patchOne(map, TRAPPED_CHEST_ITEM_ID, ChestSpecialRenderer.TRAPPED_CHEST_TEXTURE);
 
         return new ClientItemInfoLoader.LoadedClientInfos(Map.copyOf(map));
     }
@@ -80,17 +78,18 @@ public class ClientItemInfoLoaderMixin {
     @Unique
     @SuppressWarnings({"rawtypes", "unchecked"})
     private static ItemModel.Unbaked patchModel(ItemModel.Unbaked model, Identifier fallbackTexture) {
-        if (model instanceof SpecialModelWrapper.Unbaked(Identifier base, Optional<Transformation> transformation, SpecialModelRenderer.Unbaked special)) {
-            if (special instanceof ChestSpecialRenderer.Unbaked(Identifier tex, float openness, ChestType type)) {
-                if (tex.equals(ChestSpecialRenderer.CHRISTMAS.single()) || tex.getPath().contains("Christmas")) {
-                    ChestSpecialRenderer.Unbaked replaced = new ChestSpecialRenderer.Unbaked(fallbackTexture, openness, type);
-                    return new SpecialModelWrapper.Unbaked(base, transformation, replaced);
+
+        if (model instanceof SpecialModelWrapper.Unbaked(Identifier base, SpecialModelRenderer.Unbaked special)) {
+            if (special instanceof ChestSpecialRenderer.Unbaked(Identifier tex, float openness)) {
+                if (tex.equals(ChestSpecialRenderer.GIFT_CHEST_TEXTURE) || tex.getPath().contains("Christmas")) {
+                    ChestSpecialRenderer.Unbaked replaced = new ChestSpecialRenderer.Unbaked(fallbackTexture, openness);
+                    return new SpecialModelWrapper.Unbaked(base, replaced);
                 }
             }
             return model;
         }
 
-        if (model instanceof SelectItemModel.Unbaked(Optional<Transformation> transformation, SelectItemModel.UnbakedSwitch<?, ?> sw, Optional<ItemModel.Unbaked> oldFallback)) {
+        if (model instanceof SelectItemModel.Unbaked(SelectItemModel.UnbakedSwitch<?, ?> sw, Optional<ItemModel.Unbaked> oldFallback)) {
             List<SelectItemModel.SwitchCase> cases = (List) sw.cases();
 
             boolean changed = false;
@@ -108,7 +107,7 @@ public class ClientItemInfoLoaderMixin {
             if (!changed) return model;
 
             SelectItemModel.UnbakedSwitch newSw = new SelectItemModel.UnbakedSwitch(sw.property(), newCases);
-            return new SelectItemModel.Unbaked(transformation, newSw, newFallback);
+            return new SelectItemModel.Unbaked(newSw, newFallback);
         }
         return model;
     }

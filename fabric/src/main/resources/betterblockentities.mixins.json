@@ -1,7 +1,7 @@
 {
   "required": true,
   "package": "betterblockentities.mixin",
-  "compatibilityLevel": "JAVA_25",
+  "compatibilityLevel": "JAVA_17",
   "mixins": [
     "core.ClientLevelMixin",
     "core.MinecraftMixin",
@@ -17,7 +17,6 @@
     "render.immediate.blockentity.BlockEntityRenderersAccessor",
     "render.immediate.blockentity.BlockEntityRenderersMixin",
     "render.immediate.blockentity.banner.BannerBlockEntityMixin",
-    "render.immediate.blockentity.banner.BannerRendererAccessor",
     "render.immediate.blockentity.bed.BedBlockEntityMixin",
     "render.immediate.blockentity.bell.BellBlockEntityMixin",
     "render.immediate.blockentity.campfire.CampfireBlockEntityMixin",

@@ -1,6 +1,8 @@
 package betterblockentities.client.render.immediate.blockentity.renderers;
 
 /* minecraft */
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -13,161 +15,84 @@ import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.blockentity.WallAndGroundTransformations;
-import net.minecraft.client.renderer.blockentity.state.SignRenderState;
-import net.minecraft.client.renderer.blockentity.state.StandingSignRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.resources.model.sprite.SpriteGetter;
-import net.minecraft.client.resources.model.sprite.SpriteId;
-import net.minecraft.core.Direction;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.MaterialSet;
 import net.minecraft.util.Unit;
-import net.minecraft.world.level.block.PlainSignBlock;
 import net.minecraft.world.level.block.StandingSignBlock;
-import net.minecraft.world.level.block.WallSignBlock;
-import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.RotationSegment;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.phys.Vec3;
 
 /* mojang */
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import com.mojang.math.Transformation;
 
 /* java/misc */
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
-import org.joml.Vector3fc;
 import java.util.Map;
 import com.google.common.collect.ImmutableMap;
 
-public class BBEStandingSignRenderer extends BBEAbstractSignRenderer<StandingSignRenderState> {
-    private static final float RENDER_SCALE = 0.6666667F;
-    private static final Vector3fc TEXT_OFFSET = new Vector3f(0.0F, 0.33333334F, 0.046666667F);
-    public static final WallAndGroundTransformations<SignRenderState.SignTransformations> TRANSFORMATIONS = new WallAndGroundTransformations<>(
-            BBEStandingSignRenderer::createWallTransformation, BBEStandingSignRenderer::createGroundTransformation, 16
-    );
+public class BBEStandingSignRenderer extends BBEAbstractSignRenderer {
+    public static final float RENDER_SCALE = 0.6666667F;
+    private static final Vec3 TEXT_OFFSET = new Vec3(0.0, 0.33333334F, 0.046666667F);
     private final Map<WoodType, BBEStandingSignRenderer.Models> signModels;
 
-    public BBEStandingSignRenderer(final BlockEntityRendererProvider.Context context) {
+    public BBEStandingSignRenderer(BlockEntityRendererProvider.Context context) {
         super(context);
         this.signModels = (Map<WoodType, BBEStandingSignRenderer.Models>)WoodType.values()
-                .collect(ImmutableMap.toImmutableMap(type -> type, type -> BBEStandingSignRenderer.Models.create(context, type)));
-    }
-
-    public StandingSignRenderState createRenderState() {
-        return new StandingSignRenderState();
-    }
-
-    public void extractRenderState(
-            final SignBlockEntity blockEntity,
-            final StandingSignRenderState state,
-            final float partialTicks,
-            final Vec3 cameraPosition,
-            final ModelFeatureRenderer.CrumblingOverlay breakProgress
-    ) {
-        super.extractRenderState(blockEntity, state, partialTicks, cameraPosition, breakProgress);
-        BlockState blockState = blockEntity.getBlockState();
-        state.attachmentType = PlainSignBlock.getAttachmentPoint(blockState);
-        if (blockState.getBlock() instanceof WallSignBlock) {
-            state.transformations = TRANSFORMATIONS.wallTransformation(blockState.getValue(WallSignBlock.FACING));
-        } else {
-            state.transformations = TRANSFORMATIONS.freeTransformations((Integer)blockState.getValue(StandingSignBlock.ROTATION));
-        }
-    }
-
-    protected Model.Simple getSignModel(final StandingSignRenderState state) {
-        return ((BBEStandingSignRenderer.Models)this.signModels.get(state.woodType)).get(state.attachmentType);
+                .collect(
+                        ImmutableMap.toImmutableMap(
+                                woodType -> woodType,
+                                woodType -> new BBEStandingSignRenderer.Models(createSignModel(context.entityModelSet(), woodType, true), createSignModel(context.entityModelSet(), woodType, false))
+                        )
+                );
     }
 
     @Override
-    protected SpriteId getSignSprite(final WoodType type) {
-        return Sheets.getSignSprite(type);
+    protected Model.Simple getSignModel(BlockState blockState, WoodType woodType) {
+        BBEStandingSignRenderer.Models models = (BBEStandingSignRenderer.Models)this.signModels.get(woodType);
+        return blockState.getBlock() instanceof StandingSignBlock ? models.standing() : models.wall();
     }
 
-    private static Matrix4f baseTransformation(final float angle, final PlainSignBlock.Attachment attachmentType) {
-        Matrix4f result = new Matrix4f().translate(0.5F, 0.5F, 0.5F).rotate(Axis.YP.rotationDegrees(-angle));
-        if (attachmentType == PlainSignBlock.Attachment.WALL) {
-            result.translate(0.0F, -0.3125F, -0.4375F);
+    @Override
+    protected Material getSignMaterial(WoodType woodType) {
+        return Sheets.getSignMaterial(woodType);
+    }
+
+    @Override
+    protected float getSignModelRenderScale() {
+        return 0.6666667F;
+    }
+
+    @Override
+    protected float getSignTextRenderScale() {
+        return 0.6666667F;
+    }
+
+    private static void translateBase(PoseStack poseStack, float f) {
+        poseStack.translate(0.5F, 0.5F, 0.5F);
+        poseStack.mulPose(Axis.YP.rotationDegrees(f));
+    }
+
+    @Override
+    protected void translateSign(PoseStack poseStack, float f, BlockState blockState) {
+        translateBase(poseStack, f);
+        if (!(blockState.getBlock() instanceof StandingSignBlock)) {
+            poseStack.translate(0.0F, -0.3125F, -0.4375F);
         }
-
-        return result;
     }
 
-    private static Transformation bodyTransformation(final PlainSignBlock.Attachment attachmentType, final float angle) {
-        return new Transformation(baseTransformation(angle, attachmentType).scale(0.6666667F, -0.6666667F, -0.6666667F));
+    @Override
+    protected Vec3 getTextOffset() {
+        return TEXT_OFFSET;
     }
 
-    private static Transformation textTransformation(final PlainSignBlock.Attachment attachmentType, final float angle, final boolean isFrontText) {
-        Matrix4f result = baseTransformation(angle, attachmentType);
-        if (!isFrontText) {
-            result.rotate(Axis.YP.rotationDegrees(180.0F));
-        }
-
-        float s = 0.010416667F;
-        return new Transformation(result.translate(TEXT_OFFSET).scale(0.010416667F, -0.010416667F, 0.010416667F));
+    public static Model.Simple createSignModel(EntityModelSet entityModelSet, WoodType woodType, boolean bl) {
+        ModelLayerLocation modelLayerLocation = bl ? ModelLayers.createStandingSignModelName(woodType) : ModelLayers.createWallSignModelName(woodType);
+        return new Model.Simple(entityModelSet.bakeLayer(modelLayerLocation), RenderTypes::entityCutoutNoCull);
     }
 
-    private static SignRenderState.SignTransformations createTransformations(final PlainSignBlock.Attachment attachmentType, final float angle) {
-        return new SignRenderState.SignTransformations(
-                bodyTransformation(attachmentType, angle), textTransformation(attachmentType, angle, true), textTransformation(attachmentType, angle, false)
-        );
-    }
-
-    private static SignRenderState.SignTransformations createGroundTransformation(final int segment) {
-        return createTransformations(PlainSignBlock.Attachment.GROUND, RotationSegment.convertToDegrees(segment));
-    }
-
-    private static SignRenderState.SignTransformations createWallTransformation(final Direction direction) {
-        return createTransformations(PlainSignBlock.Attachment.WALL, direction.toYRot());
-    }
-
-    public static void submitSpecial(
-            final SpriteGetter sprites,
-            final PoseStack poseStack,
-            final SubmitNodeCollector submitNodeCollector,
-            final int lightCoords,
-            final int overlayCoords,
-            final Model.Simple model,
-            final SpriteId sprite
-    ) {
-        submitNodeCollector.submitModel(model, Unit.INSTANCE, poseStack, lightCoords, overlayCoords, -1, sprite, sprites, 0, null);
-    }
-
-    public static Model.Simple createSignModel(final EntityModelSet entityModelSet, final WoodType woodType, final PlainSignBlock.Attachment attachment) {
-        ModelLayerLocation layer = switch (attachment) {
-            case GROUND -> ModelLayers.createStandingSignModelName(woodType);
-            case WALL -> ModelLayers.createWallSignModelName(woodType);
-        };
-        return new Model.Simple(entityModelSet.bakeLayer(layer), RenderTypes::entityCutout);
-    }
-
-    public static LayerDefinition createSignLayer(final boolean standing) {
-        MeshDefinition mesh = new MeshDefinition();
-        PartDefinition root = mesh.getRoot();
-        root.addOrReplaceChild("sign", CubeListBuilder.create().texOffs(0, 0).addBox(-12.0F, -14.0F, -1.0F, 24.0F, 12.0F, 2.0F), PartPose.ZERO);
-        if (standing) {
-            root.addOrReplaceChild("stick", CubeListBuilder.create().texOffs(0, 14).addBox(-1.0F, -2.0F, -1.0F, 2.0F, 14.0F, 2.0F), PartPose.ZERO);
-        }
-
-        return LayerDefinition.create(mesh, 64, 32);
-    }
-
-    private record Models(Model.Simple standing, Model.Simple wall) {
-        public static BBEStandingSignRenderer.Models create(final BlockEntityRendererProvider.Context context, final WoodType type) {
-            return new BBEStandingSignRenderer.Models(
-                    BBEStandingSignRenderer.createSignModel(context.entityModelSet(), type, PlainSignBlock.Attachment.GROUND),
-                    BBEStandingSignRenderer.createSignModel(context.entityModelSet(), type, PlainSignBlock.Attachment.WALL)
-            );
-        }
-
-        public Model.Simple get(final PlainSignBlock.Attachment attachmentType) {
-            return switch (attachmentType) {
-                case GROUND -> this.standing;
-                case WALL -> this.wall;
-            };
-        }
+    @Environment(EnvType.CLIENT)
+    record Models(Model.Simple standing, Model.Simple wall) {
     }
 }

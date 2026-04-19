@@ -5,13 +5,10 @@ import betterblockentities.client.BBE;
 import betterblockentities.mixin.model.modelpart.ModelPartAccessor;
 
 /* minecraft */
-import com.mojang.blaze3d.platform.Transparency;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.builders.UVPair;
-import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.geometry.BakedQuad;
-import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.Direction;
 
 /* mojang */
@@ -53,16 +50,15 @@ public class ModelUtility {
                     packedUvs[i] = UVPair.pack(u, v);
                 }
 
-
-                Material.Baked bakedMat = new Material.Baked(sprite, false);
-                BakedQuad.MaterialInfo matInfo = BakedQuad.MaterialInfo.of(bakedMat, Transparency.NONE, -1, true, 0);
-
                 /* assemble quad */
                 BakedQuad baked = new BakedQuad(
                         positions[0], positions[1], positions[2], positions[3],
                         packedUvs[0], packedUvs[1], packedUvs[2], packedUvs[3],
-                        dir,
-                        matInfo
+                        -1, //tint
+                        dir, //face direction
+                        sprite, //sprite
+                        true, //shade
+                        0 //light emission
                 );
                 output.add(baked);
             }
@@ -76,8 +72,8 @@ public class ModelUtility {
     public static Direction normalToDirection(Vector3fc normal) {
         for (Direction dir : Direction.values()) {
             if (dir.getStepX() == normal.x() &&
-                dir.getStepY() == normal.y() &&
-                dir.getStepZ() == normal.z()) {
+                    dir.getStepY() == normal.y() &&
+                    dir.getStepZ() == normal.z()) {
                 return dir;
             }
         }

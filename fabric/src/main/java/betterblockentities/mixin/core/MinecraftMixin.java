@@ -8,11 +8,13 @@ import betterblockentities.client.tasks.ManagerTasks;
 /* minecraft */
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.PlayerSkinRenderCache;
-import net.minecraft.client.renderer.block.BlockModelResolver;
+import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.item.ItemModelResolver;
+import net.minecraft.client.resources.model.AtlasManager;
 import net.minecraft.client.resources.model.ModelManager;
-import net.minecraft.client.resources.model.sprite.AtlasManager;
 import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.world.level.Level;
 import net.minecraft.client.Minecraft;
@@ -31,12 +33,13 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 public abstract class MinecraftMixin {
     @Shadow @Final public Font font;
     @Shadow @Final private ModelManager modelManager;
-    @Shadow @Final private BlockModelResolver blockModelResolver;
     @Shadow @Final private ItemModelResolver itemModelResolver;
     @Shadow @Final private EntityRenderDispatcher entityRenderDispatcher;
-    @Shadow @Final private AtlasManager atlasManager;
     @Shadow @Final private PlayerSkinRenderCache playerSkinRenderCache;
     @Shadow @Final private ReloadableResourceManager resourceManager;
+    @Shadow @Final private BlockRenderDispatcher blockRenderer;
+    @Shadow @Final private ItemRenderer itemRenderer;
+    @Shadow @Final private AtlasManager atlasManager;
 
     @WrapOperation(
             method = "<init>(Lnet/minecraft/client/main/GameConfig;)V",
@@ -49,8 +52,9 @@ public abstract class MinecraftMixin {
         BBE.GlobalScope.altRenderDispatcher = new AltRenderDispatcher(
                 this.font,
                 this.modelManager.entityModels(),
-                this.blockModelResolver,
+                this.blockRenderer,
                 this.itemModelResolver,
+                this.itemRenderer,
                 this.entityRenderDispatcher,
                 this.atlasManager,
                 this.playerSkinRenderCache

@@ -8,13 +8,14 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.renderer.PlayerSkinRenderCache;
 import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.block.BlockModelResolver;
+import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.item.ItemModelResolver;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.client.resources.model.sprite.SpriteGetter;
+import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.resources.model.MaterialSet;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -41,27 +42,30 @@ public class AltRenderDispatcher implements ResourceManagerReloadListener {
     private final Font font;
     private final Supplier<EntityModelSet> entityModelSet;
     private Vec3 cameraPos;
-    private final BlockModelResolver blockModelResolver;
+    private final BlockRenderDispatcher blockRenderDispatcher;
     private final ItemModelResolver itemModelResolver;
+    private final ItemRenderer itemRenderer;
     private final EntityRenderDispatcher entityRenderer;
-    private final SpriteGetter sprites;
+    private final MaterialSet materials;
     private final PlayerSkinRenderCache playerSkinRenderCache;
 
     public AltRenderDispatcher(
-            final Font font,
-            final Supplier<EntityModelSet> entityModelSet,
-            final BlockModelResolver blockModelResolver,
-            final ItemModelResolver itemModelResolver,
-            final EntityRenderDispatcher entityRenderer,
-            final SpriteGetter sprites,
-            final PlayerSkinRenderCache playerSkinRenderCache
+            Font font,
+            Supplier<EntityModelSet> supplier,
+            BlockRenderDispatcher blockRenderDispatcher,
+            ItemModelResolver itemModelResolver,
+            ItemRenderer itemRenderer,
+            EntityRenderDispatcher entityRenderDispatcher,
+            MaterialSet materialSet,
+            PlayerSkinRenderCache playerSkinRenderCache
     ) {
-        this.blockModelResolver = blockModelResolver;
+        this.itemRenderer = itemRenderer;
         this.itemModelResolver = itemModelResolver;
-        this.entityRenderer = entityRenderer;
+        this.entityRenderer = entityRenderDispatcher;
         this.font = font;
-        this.entityModelSet = entityModelSet;
-        this.sprites = sprites;
+        this.entityModelSet = supplier;
+        this.blockRenderDispatcher = blockRenderDispatcher;
+        this.materials = materialSet;
         this.playerSkinRenderCache = playerSkinRenderCache;
     }
 
@@ -140,12 +144,13 @@ public class AltRenderDispatcher implements ResourceManagerReloadListener {
     public void onResourceManagerReload(final @NonNull ResourceManager resourceManager) {
         AltRendererProvider.Context context = new AltRendererProvider.Context(
                 this,
-                this.blockModelResolver,
+                this.blockRenderDispatcher,
                 this.itemModelResolver,
+                this.itemRenderer,
                 this.entityRenderer,
                 this.entityModelSet.get(),
                 this.font,
-                this.sprites,
+                this.materials,
                 this.playerSkinRenderCache
         );
         this.renderers = AltRenderers.createAltEntityRenderers(context);

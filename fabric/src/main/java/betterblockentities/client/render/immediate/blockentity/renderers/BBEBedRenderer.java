@@ -17,10 +17,10 @@ import net.minecraft.client.renderer.blockentity.state.BedRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.sprite.SpriteGetter;
-import net.minecraft.client.resources.model.sprite.SpriteId;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.MaterialSet;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Unit;
 import net.minecraft.util.Util;
@@ -42,23 +42,23 @@ import java.util.Map;
 import java.util.function.Consumer;
 import org.joml.Matrix4f;
 import org.joml.Vector3fc;
+import org.jspecify.annotations.Nullable;
 
 public class BBEBedRenderer implements BlockEntityRenderer<BedBlockEntity, BedRenderState> {
-    private static final Map<Direction, Transformation> TRANSFORMATIONS = Util.makeEnumMap(Direction.class, BBEBedRenderer::createModelTransform);
-    private final SpriteGetter sprites;
+    private final MaterialSet materials;
     private final Model.Simple headModel;
     private final Model.Simple footModel;
 
-    public BBEBedRenderer(final BlockEntityRendererProvider.Context context) {
-        this(context.sprites(), context.entityModelSet());
+    public BBEBedRenderer(BlockEntityRendererProvider.Context context) {
+        this(context.materials(), context.entityModelSet());
     }
 
-    public BBEBedRenderer(final SpecialModelRenderer.BakingContext context) {
-        this(context.sprites(), context.entityModelSet());
+    public BBEBedRenderer(SpecialModelRenderer.BakingContext bakingContext) {
+        this(bakingContext.materials(), bakingContext.entityModelSet());
     }
 
-    public BBEBedRenderer(final SpriteGetter sprites, final EntityModelSet entityModelSet) {
-        this.sprites = sprites;
+    public BBEBedRenderer(MaterialSet materialSet, EntityModelSet entityModelSet) {
+        this.materials = materialSet;
         this.headModel = new Model.Simple(entityModelSet.bakeLayer(ModelLayers.BED_HEAD), RenderTypes::entitySolid);
         this.footModel = new Model.Simple(entityModelSet.bakeLayer(ModelLayers.BED_FOOT), RenderTypes::entitySolid);
     }
@@ -67,63 +67,67 @@ public class BBEBedRenderer implements BlockEntityRenderer<BedBlockEntity, BedRe
         return new BedRenderState();
     }
 
-    public void extractRenderState(
-            final BedBlockEntity blockEntity,
-            final BedRenderState state,
-            final float partialTicks,
-            final Vec3 cameraPosition,
-            final ModelFeatureRenderer.CrumblingOverlay breakProgress
-    ) {
-        BlockEntityRenderer.super.extractRenderState(blockEntity, state, partialTicks, cameraPosition, breakProgress);
-        state.color = blockEntity.getColor();
-        state.facing = blockEntity.getBlockState().getValue(BedBlock.FACING);
-        state.part = blockEntity.getBlockState().getValue(BedBlock.PART);
-        if (blockEntity.getLevel() != null) {
-            DoubleBlockCombiner.NeighborCombineResult<? extends BedBlockEntity> combineResult = DoubleBlockCombiner.combineWithNeigbour(
+    public void extractRenderState(final BedBlockEntity bedBlockEntity, final BedRenderState bedRenderState, final float partialTicks, final Vec3 cameraPosition, final ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
+        BlockEntityRenderer.super.extractRenderState(bedBlockEntity, bedRenderState, partialTicks, cameraPosition, crumblingOverlay);
+        bedRenderState.color = bedBlockEntity.getColor();
+        bedRenderState.facing = bedBlockEntity.getBlockState().getValue(BedBlock.FACING);
+        bedRenderState.isHead = bedBlockEntity.getBlockState().getValue(BedBlock.PART) == BedPart.HEAD;
+        if (bedBlockEntity.getLevel() != null) {
+            DoubleBlockCombiner.NeighborCombineResult<? extends BedBlockEntity> neighborCombineResult = DoubleBlockCombiner.combineWithNeigbour(
                     BlockEntityType.BED,
                     BedBlock::getBlockType,
                     BedBlock::getConnectedDirection,
                     ChestBlock.FACING,
-                    blockEntity.getBlockState(),
-                    blockEntity.getLevel(),
-                    blockEntity.getBlockPos(),
+                    bedBlockEntity.getBlockState(),
+                    bedBlockEntity.getLevel(),
+                    bedBlockEntity.getBlockPos(),
                     (levelAccessor, blockPos) -> false
             );
-            state.lightCoords = combineResult.apply(new BrightnessCombiner<>()).get(state.lightCoords);
+            bedRenderState.lightCoords = neighborCombineResult.apply(new BrightnessCombiner<>()).get(bedRenderState.lightCoords);
         }
 
-        ((BlockEntityRenderStateExt)state).blockEntity(blockEntity);
+        ((BlockEntityRenderStateExt)bedRenderState).blockEntity(bedBlockEntity);
     }
 
-    public void submit(final BedRenderState state, final PoseStack poseStack, final SubmitNodeCollector submitNodeCollector, final CameraRenderState camera) {
-        SpriteId sprite = Sheets.getBedSprite(state.color);
-        poseStack.pushPose();
-        poseStack.mulPose(modelTransform(state.facing));
+    public void submit(BedRenderState bedRenderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState) {
+        Material material = Sheets.getBedMaterial(bedRenderState.color);
+        this.submitPiece(
+                bedRenderState,
+                poseStack,
+                submitNodeCollector,
+                bedRenderState.isHead ? this.headModel : this.footModel,
+                bedRenderState.facing,
+                material,
+                bedRenderState.lightCoords,
+                OverlayTexture.NO_OVERLAY,
+                false,
+                bedRenderState.breakProgress,
+                0
+        );
+    }
 
-        this.submitPiece(state, state.part, sprite, poseStack, submitNodeCollector, state.lightCoords, OverlayTexture.NO_OVERLAY, state.breakProgress, 0);
+    public void submitPiece(final BedRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, Model.Simple simple, Direction direction, Material material, int i, int j, boolean bl, ModelFeatureRenderer.CrumblingOverlay crumblingOverlay, int k) {
+        BlockEntityRenderStateExt stateExt = (BlockEntityRenderStateExt)state;
+
+        poseStack.pushPose();
+        preparePose(poseStack, bl, direction);
+
+        boolean managed = OverlayRenderer.manageCrumblingOverlay(stateExt.blockEntity(), poseStack, simple, Unit.INSTANCE, state.lightCoords, OverlayTexture.NO_OVERLAY, -1, state.breakProgress);
+        if (!managed) {
+            submitNodeCollector.submitModel(
+                    simple, Unit.INSTANCE, poseStack, material.renderType(RenderTypes::entitySolid), i, j, -1, this.materials.get(material), k, crumblingOverlay
+            );
+        }
 
         poseStack.popPose();
     }
 
-    public void submitPiece(
-            final BedRenderState state,
-            final BedPart part,
-            final SpriteId sprite,
-            final PoseStack poseStack,
-            final SubmitNodeCollector submitNodeCollector,
-            final int lightCoords,
-            final int overlayCoords,
-            final ModelFeatureRenderer.CrumblingOverlay breakProgress,
-            final int outlineColor
-    ) {
-        Model.Simple model = this.getPieceModel(part);
-
-        BlockEntityRenderStateExt stateExt = (BlockEntityRenderStateExt)state;
-
-        boolean managed = OverlayRenderer.manageCrumblingOverlay(stateExt.blockEntity(), poseStack, model, Unit.INSTANCE, state.lightCoords, OverlayTexture.NO_OVERLAY, -1, state.breakProgress);
-        if (!managed) {
-            submitNodeCollector.submitModel(model, Unit.INSTANCE, poseStack, lightCoords, overlayCoords, -1, sprite, this.sprites, outlineColor, breakProgress);
-        }
+    private static void preparePose(PoseStack poseStack, boolean bl, Direction direction) {
+        poseStack.translate(0.0F, 0.5625F, bl ? -1.0F : 0.0F);
+        poseStack.mulPose(Axis.XP.rotationDegrees(90.0F));
+        poseStack.translate(0.5F, 0.5F, 0.5F);
+        poseStack.mulPose(Axis.ZP.rotationDegrees(180.0F + direction.toYRot()));
+        poseStack.translate(-0.5F, -0.5F, -0.5F);
     }
 
     private Model.Simple getPieceModel(final BedPart part) {
@@ -131,19 +135,6 @@ public class BBEBedRenderer implements BlockEntityRenderer<BedBlockEntity, BedRe
             case HEAD -> this.headModel;
             case FOOT -> this.footModel;
         };
-    }
-
-    private static Transformation createModelTransform(final Direction direction) {
-        return new Transformation(
-                new Matrix4f()
-                        .translation(0.0F, 0.5625F, 0.0F)
-                        .rotate(Axis.XP.rotationDegrees(90.0F))
-                        .rotateAround(Axis.ZP.rotationDegrees(180.0F + direction.toYRot()), 0.5F, 0.5F, 0.5F)
-        );
-    }
-
-    public static Transformation modelTransform(final Direction direction) {
-        return (Transformation)TRANSFORMATIONS.get(direction);
     }
 
     public void getExtents(final BedPart part, final Consumer<Vector3fc> output) {

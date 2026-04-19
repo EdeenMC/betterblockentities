@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(MipmapGenerator.class)
 public abstract class MipMapGeneratorMixin {
-    @Redirect(method = "generateMipLevels(Lnet/minecraft/resources/Identifier;[Lcom/mojang/blaze3d/platform/NativeImage;ILnet/minecraft/client/renderer/texture/MipmapStrategy;FLcom/mojang/blaze3d/platform/Transparency;)[Lcom/mojang/blaze3d/platform/NativeImage;",
+    @Redirect(method = "generateMipLevels(Lnet/minecraft/resources/Identifier;[Lcom/mojang/blaze3d/platform/NativeImage;ILnet/minecraft/client/renderer/texture/MipmapStrategy;F)[Lcom/mojang/blaze3d/platform/NativeImage;",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/texture/MipmapGenerator;scaleAlphaToCoverage(Lcom/mojang/blaze3d/platform/NativeImage;FFF)V")
     )
     private static void skipEntityTextureAlphaCoverage(NativeImage image, float h, float g, float f, Identifier identifier) {

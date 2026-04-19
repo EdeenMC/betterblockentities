@@ -1,15 +1,16 @@
 package betterblockentities.client.render.immediate.blockentity.renderers;
 
 /* local */
+import betterblockentities.client.gui.config.ConfigCache;
 import betterblockentities.client.model.overrides.ChestModelOverride;
 import betterblockentities.client.render.immediate.OverlayRenderer;
 import betterblockentities.client.render.immediate.blockentity.extentions.BlockEntityRenderStateExt;
 
 /* minecraft */
+import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.object.chest.ChestModel;
-import net.minecraft.client.renderer.MultiblockChestResources;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
@@ -17,10 +18,13 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.BrightnessCombiner;
 import net.minecraft.client.renderer.blockentity.state.ChestRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.sprite.SpriteGetter;
-import net.minecraft.client.resources.model.sprite.SpriteId;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.MaterialSet;
 import net.minecraft.core.Direction;
 import net.minecraft.util.SpecialDates;
 import net.minecraft.util.Util;
@@ -28,6 +32,7 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.ChestType;
+import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.Vec3;
 
 /* mojang */
@@ -37,23 +42,43 @@ import com.mojang.math.Transformation;
 
 /* java/misc */
 import org.joml.Matrix4f;
+import org.jspecify.annotations.Nullable;
+
 import java.util.Map;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class BBEChestRenderer<T extends BlockEntity & LidBlockEntity> implements BlockEntityRenderer<T, ChestRenderState> {
-    public static final MultiblockChestResources<ModelLayerLocation> LAYERS;
-    private static final Map<Direction, Transformation> TRANSFORMATIONS;
-    private final SpriteGetter sprites;
+    private final MaterialSet materials;
     private final boolean xmasTextures;
 
-    private final MultiblockChestResources<ChestModel> models;
-    private final MultiblockChestResources<ChestModel> bbeModels;
+    private ChestModel singleModel;
+    private ChestModel doubleLeftModel;
+    private ChestModel doubleRightModel;
 
-    public BBEChestRenderer(final BlockEntityRendererProvider.Context context) {
-        this.sprites = context.sprites();
+    private final ChestModel singleModelOrg;
+    private final ChestModel doubleLeftModelOrg;
+    private final ChestModel doubleRightModelOrg;
+
+    private final ChestModel BBEsingleModel;
+    private final ChestModel BBEdoubleLeftModel;
+    private final ChestModel BBEdoubleRightModel;
+
+    public BBEChestRenderer(BlockEntityRendererProvider.Context context) {
+        this.materials = context.materials();
         this.xmasTextures = xmasTextures();
-        this.models = LAYERS.map((layer) -> new ChestModel(context.bakeLayer(layer)));
-        this.bbeModels = LAYERS.map((layer) -> new ChestModelOverride(context.bakeLayer(layer)));
+
+
+        this.singleModel = new ChestModel(context.bakeLayer(ModelLayers.CHEST));
+        this.doubleLeftModel = new ChestModel(context.bakeLayer(ModelLayers.DOUBLE_CHEST_LEFT));
+        this.doubleRightModel = new ChestModel(context.bakeLayer(ModelLayers.DOUBLE_CHEST_RIGHT));
+
+        this.singleModelOrg = new ChestModel(context.bakeLayer(ModelLayers.CHEST));
+        this.doubleLeftModelOrg = new ChestModel(context.bakeLayer(ModelLayers.DOUBLE_CHEST_LEFT));
+        this.doubleRightModelOrg = new ChestModel(context.bakeLayer(ModelLayers.DOUBLE_CHEST_RIGHT));
+
+        this.BBEsingleModel = new ChestModelOverride(context.bakeLayer(ModelLayers.CHEST));
+        this.BBEdoubleLeftModel = new ChestModelOverride(context.bakeLayer(ModelLayers.DOUBLE_CHEST_LEFT));
+        this.BBEdoubleRightModel = new ChestModelOverride(context.bakeLayer(ModelLayers.DOUBLE_CHEST_RIGHT));
     }
 
     public static boolean xmasTextures() {
@@ -64,49 +89,112 @@ public class BBEChestRenderer<T extends BlockEntity & LidBlockEntity> implements
         return new ChestRenderState();
     }
 
-    public void extractRenderState(
-            final T blockEntity,
-            final ChestRenderState state,
-            final float partialTicks,
-            final Vec3 cameraPosition,
-            final ModelFeatureRenderer.CrumblingOverlay breakProgress
-    ) {
-        BlockEntityRenderer.super.extractRenderState(blockEntity, state, partialTicks, cameraPosition, breakProgress);
-        boolean hasLevel = blockEntity.getLevel() != null;
-        BlockState blockState = hasLevel ? blockEntity.getBlockState() : Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, Direction.SOUTH);
-        state.type = blockState.hasProperty(ChestBlock.TYPE) ? blockState.getValue(ChestBlock.TYPE) : ChestType.SINGLE;
-        state.facing = blockState.getValue(ChestBlock.FACING);
-        state.material = getChestMaterial(blockEntity, this.xmasTextures);
-        DoubleBlockCombiner.NeighborCombineResult<? extends ChestBlockEntity> combineResult;
-        if (hasLevel && blockState.getBlock() instanceof ChestBlock chestBlock) {
-            combineResult = chestBlock.combine(blockState, blockEntity.getLevel(), blockEntity.getBlockPos(), true);
+    public void extractRenderState(T blockEntity, ChestRenderState chestRenderState, float f, Vec3 vec3, ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
+        BlockEntityRenderer.super.extractRenderState(blockEntity, chestRenderState, f, vec3, crumblingOverlay);
+        boolean bl = blockEntity.getLevel() != null;
+        BlockState blockState = bl ? blockEntity.getBlockState() : Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, Direction.SOUTH);
+        chestRenderState.type = blockState.hasProperty(ChestBlock.TYPE) ? blockState.getValue(ChestBlock.TYPE) : ChestType.SINGLE;
+        chestRenderState.angle = (blockState.getValue(ChestBlock.FACING)).toYRot();
+        chestRenderState.material = this.getChestMaterial(blockEntity, this.xmasTextures);
+        DoubleBlockCombiner.NeighborCombineResult<? extends ChestBlockEntity> neighborCombineResult;
+        if (bl && blockState.getBlock() instanceof ChestBlock chestBlock) {
+            neighborCombineResult = chestBlock.combine(blockState, blockEntity.getLevel(), blockEntity.getBlockPos(), true);
         } else {
-            combineResult = DoubleBlockCombiner.Combiner::acceptNone;
+            neighborCombineResult = DoubleBlockCombiner.Combiner::acceptNone;
         }
 
-        state.open = combineResult.apply(ChestBlock.opennessCombiner(blockEntity)).get(partialTicks);
-        if (state.type != ChestType.SINGLE) {
-            state.lightCoords = combineResult.apply(new BrightnessCombiner<>()).applyAsInt(state.lightCoords);
+        chestRenderState.open = neighborCombineResult.apply(ChestBlock.opennessCombiner(blockEntity)).get(f);
+        if (chestRenderState.type != ChestType.SINGLE) {
+            chestRenderState.lightCoords = neighborCombineResult.apply(new BrightnessCombiner<>()).applyAsInt(chestRenderState.lightCoords);
         }
 
-        ((BlockEntityRenderStateExt)state).blockEntity(blockEntity);
+        ((BlockEntityRenderStateExt)chestRenderState).blockEntity(blockEntity);
     }
 
-    public void submit(final ChestRenderState state, final PoseStack poseStack, final SubmitNodeCollector submitNodeCollector, final CameraRenderState camera) {
-        poseStack.pushPose();
-        poseStack.mulPose(modelTransformation(state.facing));
-        float open = state.open;
-        open = 1.0F - open;
-        open = 1.0F - open * open * open;
-        SpriteId spriteId = Sheets.chooseSprite(state.material, state.type);
+    public <S> void submitManagedModel(ChestRenderState state, SubmitNodeCollector collector, Model<? super S> model, S object, PoseStack poseStack, RenderType renderType, int i, int j, int k, TextureAtlasSprite textureAtlasSprite, int l, ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
+        this.singleModel = singleModelOrg;
+        this.doubleLeftModel = doubleLeftModelOrg;
+        this.doubleRightModel = this.doubleRightModelOrg;
+
+        if (!ConfigCache.optimizeChests || !ConfigCache.masterOptimize) {
+            collector.submitModel(model, object, poseStack, renderType, i, j, k, textureAtlasSprite, l, crumblingOverlay);
+            return;
+        }
 
         BlockEntityRenderStateExt stateExt = (BlockEntityRenderStateExt)state;
 
-        ChestModel model = (ChestModel)this.models.select(state.type);
-        boolean managed = OverlayRenderer.manageCrumblingOverlay(stateExt.blockEntity(), poseStack, model, open, state.lightCoords, OverlayTexture.NO_OVERLAY, -1, state.breakProgress);
+        boolean managed = OverlayRenderer.manageCrumblingOverlay(stateExt.blockEntity(), poseStack, model, object, i, j, k, crumblingOverlay);
         if (!managed) {
-            model = (ChestModel)this.bbeModels.select(state.type);
-            submitNodeCollector.submitModel(model, open, poseStack, state.lightCoords, OverlayTexture.NO_OVERLAY, -1, spriteId, this.sprites, 0, state.breakProgress);
+            this.singleModel = this.BBEsingleModel;
+            this.doubleLeftModel = this.BBEdoubleLeftModel;
+            this.doubleRightModel = this.BBEdoubleRightModel;
+
+            collector.submitModel(model, object, poseStack, renderType, i, j, k, textureAtlasSprite, l, crumblingOverlay);
+        }
+    }
+
+
+
+    public void submit(ChestRenderState chestRenderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState) {
+        poseStack.pushPose();
+        poseStack.translate(0.5F, 0.5F, 0.5F);
+        poseStack.mulPose(Axis.YP.rotationDegrees(-chestRenderState.angle));
+        poseStack.translate(-0.5F, -0.5F, -0.5F);
+        float f = chestRenderState.open;
+        f = 1.0F - f;
+        f = 1.0F - f * f * f;
+        Material material = Sheets.chooseMaterial(chestRenderState.material, chestRenderState.type);
+        RenderType renderType = material.renderType(RenderTypes::entityCutout);
+        TextureAtlasSprite textureAtlasSprite = this.materials.get(material);
+
+
+        if (chestRenderState.type != ChestType.SINGLE) {
+            if (chestRenderState.type == ChestType.LEFT) {
+                submitManagedModel(
+                        chestRenderState,
+                        submitNodeCollector,
+                        this.doubleLeftModel,
+                        f,
+                        poseStack,
+                        renderType,
+                        chestRenderState.lightCoords,
+                        OverlayTexture.NO_OVERLAY,
+                        -1,
+                        textureAtlasSprite,
+                        0,
+                        chestRenderState.breakProgress
+                );
+            } else {
+                submitManagedModel(
+                        chestRenderState,
+                        submitNodeCollector,
+                        this.doubleRightModel,
+                        f,
+                        poseStack,
+                        renderType,
+                        chestRenderState.lightCoords,
+                        OverlayTexture.NO_OVERLAY,
+                        -1,
+                        textureAtlasSprite,
+                        0,
+                        chestRenderState.breakProgress
+                );
+            }
+        } else {
+            submitManagedModel(
+                    chestRenderState,
+                    submitNodeCollector,
+                    this.singleModel,
+                    f,
+                    poseStack,
+                    renderType,
+                    chestRenderState.lightCoords,
+                    OverlayTexture.NO_OVERLAY,
+                    -1,
+                    textureAtlasSprite,
+                    0,
+                    chestRenderState.breakProgress
+            );
         }
 
         poseStack.popPose();
@@ -133,18 +221,5 @@ public class BBEChestRenderer<T extends BlockEntity & LidBlockEntity> implements
         } else {
             return entity instanceof TrappedChestBlockEntity ? ChestRenderState.ChestMaterialType.TRAPPED : ChestRenderState.ChestMaterialType.REGULAR;
         }
-    }
-
-    public static Transformation modelTransformation(final Direction facing) {
-        return (Transformation)TRANSFORMATIONS.get(facing);
-    }
-
-    private static Transformation createModelTransformation(final Direction facing) {
-        return new Transformation((new Matrix4f()).rotationAround(Axis.YP.rotationDegrees(-facing.toYRot()), 0.5F, 0.0F, 0.5F));
-    }
-
-    static {
-        LAYERS = new MultiblockChestResources(ModelLayers.CHEST, ModelLayers.DOUBLE_CHEST_LEFT, ModelLayers.DOUBLE_CHEST_RIGHT);
-        TRANSFORMATIONS = Util.makeEnumMap(Direction.class, BBEChestRenderer::createModelTransformation);
     }
 }

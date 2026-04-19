@@ -7,6 +7,7 @@ import betterblockentities.client.render.immediate.OverlayRenderer;
 import betterblockentities.mixin.render.immediate.blockentity.BlockEntityRenderStateAccessor;
 
 /* minecraft */
+import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.model.Model;
@@ -16,10 +17,11 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.SignRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.sprite.SpriteGetter;
-import net.minecraft.client.resources.model.sprite.SpriteId;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.MaterialSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
@@ -44,51 +46,67 @@ import org.spongepowered.asm.mixin.Unique;
 
 /* java/misc */
 import java.util.List;
+import java.util.Objects;
 
-public abstract class BBEAbstractSignRenderer<S extends SignRenderState> implements BlockEntityRenderer<SignBlockEntity, S> {
+public abstract class BBEAbstractSignRenderer implements BlockEntityRenderer<SignBlockEntity, SignRenderState> {
     private static final int BLACK_TEXT_OUTLINE_COLOR = -988212;
     private static final int OUTLINE_RENDER_DISTANCE = Mth.square(16);
     private final Font font;
-    private final SpriteGetter sprites;
+    private final MaterialSet materials;
 
-    public BBEAbstractSignRenderer(final BlockEntityRendererProvider.Context context) {
+    public BBEAbstractSignRenderer(BlockEntityRendererProvider.Context context) {
         this.font = context.font();
-        this.sprites = context.sprites();
+        this.materials = context.materials();
     }
 
-    protected abstract Model.Simple getSignModel(S state);
+    protected abstract Model.Simple getSignModel(BlockState blockState, WoodType woodType);
 
-    protected abstract SpriteId getSignSprite(WoodType type);
+    protected abstract Material getSignMaterial(WoodType woodType);
 
-    public void submit(final S state, final PoseStack poseStack, final SubmitNodeCollector submitNodeCollector, final CameraRenderState cameraRenderState) {
+    protected abstract float getSignModelRenderScale();
+
+    protected abstract float getSignTextRenderScale();
+
+    protected abstract Vec3 getTextOffset();
+
+    protected abstract void translateSign(PoseStack poseStack, float f, BlockState blockState);
+
+    public void submit(SignRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState) {
         final BlockState bs = ((BlockEntityRenderStateAccessor)state).getBlockState();
         final SignBlock signBlock = (SignBlock)bs.getBlock();
 
         if (!BBE.GlobalScope.limitVanillaSignRendering) {
-            Model.Simple bodyModel = this.getSignModel(state);
+            Model.Simple simple = this.getSignModel(bs, signBlock.type());
 
             poseStack.pushPose();
-            poseStack.mulPose(state.transformations.body());
-            this.submitSign(poseStack, state.lightCoords, signBlock.type(), bodyModel, state.breakProgress, submitNodeCollector);
+            this.translateSign(poseStack, -signBlock.getYRotationDegrees(bs), bs);
+            this.submitSign(poseStack, state.lightCoords, signBlock.type(), simple, state.breakProgress, submitNodeCollector);
             poseStack.popPose();
         }
-        manageCrumblingOverlay(state, poseStack);
+        manageCrumblingOverlay(state, poseStack, signBlock, bs);
         renderCulledText(state, cameraRenderState, bs, signBlock, poseStack, submitNodeCollector);
     }
 
-    @Unique
-    protected void submitSign(final PoseStack poseStack, final int lightCoords, final WoodType type, final Model.Simple signModel, final ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress, final SubmitNodeCollector submitNodeCollector) {
-        SpriteId sprite = this.getSignSprite(type);
-        submitNodeCollector.submitModel(signModel, Unit.INSTANCE, poseStack, lightCoords, OverlayTexture.NO_OVERLAY, -1, sprite, this.sprites, 0, breakProgress);
+    protected void submitSign(PoseStack poseStack, int i, WoodType woodType, Model.Simple simple, ModelFeatureRenderer.@Nullable CrumblingOverlay crumblingOverlay, SubmitNodeCollector submitNodeCollector) {
+        poseStack.pushPose();
+        float f = this.getSignModelRenderScale();
+        poseStack.scale(f, -f, -f);
+        Material material = this.getSignMaterial(woodType);
+        Objects.requireNonNull(simple);
+        RenderType renderType = material.renderType(simple::renderType);
+        submitNodeCollector.submitModel(simple, Unit.INSTANCE, poseStack, renderType, i, OverlayTexture.NO_OVERLAY, -1, this.materials.get(material), 0, crumblingOverlay);
+        poseStack.popPose();
     }
 
-    private void manageCrumblingOverlay(S state, PoseStack poseStack) {
+    private void manageCrumblingOverlay(SignRenderState state, PoseStack poseStack, SignBlock signBlock, BlockState bs) {
         if (state.breakProgress == null) return;
 
-        final Model.Simple model = this.getSignModel(state);
+        final Model.Simple model = this.getSignModel(bs, signBlock.type());
 
         poseStack.pushPose();
-        poseStack.mulPose(state.transformations.body());
+        this.translateSign(poseStack, -signBlock.getYRotationDegrees(bs), bs);
+        float f = this.getSignModelRenderScale();
+        poseStack.scale(f, -f, -f);
 
         OverlayRenderer.submitCrumblingOverlay(
                 poseStack, model, Unit.INSTANCE,
@@ -99,17 +117,17 @@ public abstract class BBEAbstractSignRenderer<S extends SignRenderState> impleme
         poseStack.popPose();
     }
 
-    private void renderCulledText(S state, CameraRenderState cameraRenderState, BlockState bs, SignBlock signBlock, PoseStack poseStack, SubmitNodeCollector collector) {
+    private void renderCulledText(SignRenderState state, CameraRenderState cameraRenderState, BlockState bs, SignBlock signBlock, PoseStack poseStack, SubmitNodeCollector collector) {
         if (!ConfigCache.signTextCulling) {
             poseStack.pushPose();
-            poseStack.mulPose(state.transformations.frontText());
-            this.submitSignText(state, poseStack, collector, state.frontText);
+            this.translateSign(poseStack, -signBlock.getYRotationDegrees(bs), bs);
+            this.submitSignText(state, poseStack, collector, true);
             poseStack.popPose();
 
 
             poseStack.pushPose();
-            poseStack.mulPose(state.transformations.backText());
-            this.submitSignText(state, poseStack, collector, state.backText);
+            this.translateSign(poseStack, -signBlock.getYRotationDegrees(bs), bs);
+            this.submitSignText(state, poseStack, collector, false);
             poseStack.popPose();
             return;
         }
@@ -146,19 +164,18 @@ public abstract class BBEAbstractSignRenderer<S extends SignRenderState> impleme
 
         if (drawFront) {
             poseStack.pushPose();
-            poseStack.mulPose(state.transformations.frontText());
-            submitSignText(state, poseStack, collector, state.frontText);
+            this.translateSign(poseStack, -signBlock.getYRotationDegrees(bs), bs);
+            submitSignText(state, poseStack, collector, true);
             poseStack.popPose();
         }
         if (drawBack)  {
             poseStack.pushPose();
-            poseStack.mulPose(state.transformations.backText());
-            submitSignText(state, poseStack, collector, state.backText);
+            this.translateSign(poseStack, -signBlock.getYRotationDegrees(bs), bs);
+            submitSignText(state, poseStack, collector, false);
             poseStack.popPose();
         }
     }
 
-    @Unique
     private static boolean hasAnyText(SignText text, boolean filtered) {
         if (text == null) return false;
         Component[] lines = text.getMessages(filtered);
@@ -168,42 +185,48 @@ public abstract class BBEAbstractSignRenderer<S extends SignRenderState> impleme
         return false;
     }
 
-    private void submitSignText(final S state, final PoseStack poseStack, final SubmitNodeCollector submitNodeCollector, final SignText signText) {
-        int darkColor = getDarkColor(signText);
-        int signMidpoint = 4 * state.textLineHeight / 2;
-        FormattedCharSequence[] formattedLines = signText.getRenderMessages(state.isTextFilteringEnabled, input -> {
-            List<FormattedCharSequence> components = this.font.split(input, state.maxTextLineWidth);
-            return components.isEmpty() ? FormattedCharSequence.EMPTY : (FormattedCharSequence)components.get(0);
-        });
-        int textColor;
-        boolean drawOutline;
-        int lightVal;
-        if (signText.hasGlowingText()) {
-            textColor = signText.getColor().getTextColor();
-            drawOutline = textColor == DyeColor.BLACK.getTextColor() || state.drawOutline;
-            lightVal = 15728880;
-        } else {
-            textColor = darkColor;
-            drawOutline = false;
-            lightVal = state.lightCoords;
+    private void submitSignText(SignRenderState signRenderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, boolean bl) {
+        SignText signText = bl ? signRenderState.frontText : signRenderState.backText;
+        if (signText != null) {
+            poseStack.pushPose();
+            this.translateSignText(poseStack, bl, this.getTextOffset());
+            int i = getDarkColor(signText);
+            int j = 4 * signRenderState.textLineHeight / 2;
+            FormattedCharSequence[] formattedCharSequences = signText.getRenderMessages(signRenderState.isTextFilteringEnabled, (component) -> {
+                List<FormattedCharSequence> list = this.font.split(component, signRenderState.maxTextLineWidth);
+                return list.isEmpty() ? FormattedCharSequence.EMPTY : (FormattedCharSequence)list.get(0);
+            });
+            int k;
+            boolean bl2;
+            int l;
+            if (signText.hasGlowingText()) {
+                k = signText.getColor().getTextColor();
+                bl2 = k == DyeColor.BLACK.getTextColor() || signRenderState.drawOutline;
+                l = 15728880;
+            } else {
+                k = i;
+                bl2 = false;
+                l = signRenderState.lightCoords;
+            }
+
+            for(int m = 0; m < 4; ++m) {
+                FormattedCharSequence formattedCharSequence = formattedCharSequences[m];
+                float f = (float)(-this.font.width(formattedCharSequence) / 2);
+                submitNodeCollector.submitText(poseStack, f, (float)(m * signRenderState.textLineHeight - j), formattedCharSequence, false, Font.DisplayMode.POLYGON_OFFSET, l, k, 0, bl2 ? i : 0);
+            }
+
+            poseStack.popPose();
+        }
+    }
+
+    private void translateSignText(PoseStack poseStack, boolean bl, Vec3 vec3) {
+        if (!bl) {
+            poseStack.mulPose(Axis.YP.rotationDegrees(180.0F));
         }
 
-        for (int i = 0; i < 4; i++) {
-            FormattedCharSequence actualLine = formattedLines[i];
-            float x1 = -this.font.width(actualLine) / 2;
-            submitNodeCollector.submitText(
-                    poseStack,
-                    x1,
-                    i * state.textLineHeight - signMidpoint,
-                    actualLine,
-                    false,
-                    Font.DisplayMode.POLYGON_OFFSET,
-                    lightVal,
-                    textColor,
-                    0,
-                    drawOutline ? darkColor : 0
-            );
-        }
+        float f = 0.015625F * this.getSignTextRenderScale();
+        poseStack.translate(vec3);
+        poseStack.scale(f, -f, f);
     }
 
     private static boolean isOutlineVisible(final BlockPos pos) {
@@ -222,20 +245,17 @@ public abstract class BBEAbstractSignRenderer<S extends SignRenderState> impleme
         return color == DyeColor.BLACK.getTextColor() && signText.hasGlowingText() ? -988212 : ARGB.scaleRGB(color, 0.4F);
     }
 
-    public void extractRenderState(
-            final SignBlockEntity blockEntity,
-            final S state,
-            final float partialTicks,
-            final Vec3 cameraPosition,
-            final ModelFeatureRenderer.CrumblingOverlay breakProgress
-    ) {
-        BlockEntityRenderer.super.extractRenderState(blockEntity, state, partialTicks, cameraPosition, breakProgress);
-        state.maxTextLineWidth = blockEntity.getMaxTextLineWidth();
-        state.textLineHeight = blockEntity.getTextLineHeight();
-        state.frontText = blockEntity.getFrontText();
-        state.backText = blockEntity.getBackText();
-        state.isTextFilteringEnabled = Minecraft.getInstance().isTextFilteringEnabled();
-        state.drawOutline = isOutlineVisible(blockEntity.getBlockPos());
-        state.woodType = SignBlock.getWoodType(blockEntity.getBlockState().getBlock());
+    public SignRenderState createRenderState() {
+        return new SignRenderState();
+    }
+
+    public void extractRenderState(SignBlockEntity signBlockEntity, SignRenderState signRenderState, float f, Vec3 vec3, ModelFeatureRenderer.@Nullable CrumblingOverlay crumblingOverlay) {
+        BlockEntityRenderer.super.extractRenderState(signBlockEntity, signRenderState, f, vec3, crumblingOverlay);
+        signRenderState.maxTextLineWidth = signBlockEntity.getMaxTextLineWidth();
+        signRenderState.textLineHeight = signBlockEntity.getTextLineHeight();
+        signRenderState.frontText = signBlockEntity.getFrontText();
+        signRenderState.backText = signBlockEntity.getBackText();
+        signRenderState.isTextFilteringEnabled = Minecraft.getInstance().isTextFilteringEnabled();
+        signRenderState.drawOutline = isOutlineVisible(signBlockEntity.getBlockPos());
     }
 }

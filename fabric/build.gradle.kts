@@ -1,10 +1,14 @@
+import net.fabricmc.loom.task.RemapJarTask
+import org.gradle.jvm.tasks.Jar
+import org.gradle.api.file.DuplicatesStrategy
+
 plugins {
     id("java-library")
 
-    //loom (unobfuscated)
-    id("net.fabricmc.fabric-loom") version BuildConfig.LOOM_VERSION
+    // loom
+    id("fabric-loom") version BuildConfig.LOOM_VERSION
 
-    //local build-source plugins
+    // local build-source plugins
     id("build-base")
     id("build-publish")
 }
@@ -45,23 +49,17 @@ repositories {
 //specify version specific dependencies from declared maven repositories
 dependencies {
     minecraft("com.mojang:minecraft:${BuildConfig.MINECRAFT_VERSION}")
+    mappings(loom.officialMojangMappings())
 
-    implementation("net.fabricmc:fabric-loader:${BuildConfig.FABRIC_LOADER_VERSION}")
-    implementation("net.caffeinemc:sodium-fabric:${BuildConfig.SODIUM_VERSION}")
+    compileOnly("io.github.llamalad7:mixinextras-common:0.5.0")
+    annotationProcessor("io.github.llamalad7:mixinextras-common:0.5.0")
 
-    fabricModule("fabric-block-getter-api-v2")
+    compileOnly("net.fabricmc:sponge-mixin:0.13.2+mixin.0.8.5")
+
+    modImplementation("net.fabricmc:fabric-loader:${BuildConfig.FABRIC_LOADER_VERSION}")
+    modImplementation("net.caffeinemc:sodium-fabric:${BuildConfig.SODIUM_VERSION}")
+
     fabricModule("fabric-renderer-api-v1")
-}
-
-//per artifact actions
-tasks.withType<Jar>().configureEach {
-    //set base-name and our built version string
-    archiveBaseName.set(base.archivesName)
-    archiveVersion.set(project.version.toString())
-
-    //include the license file into the artifact
-    val licenseFile = rootProject.file("LICENSE")
-    from(licenseFile)
 }
 
 tasks {
@@ -70,36 +68,66 @@ tasks {
     // "rootDir/build/api"
     val modOutputDir = rootProject.layout.buildDirectory.dir("mod")
     val apiOutputDir = rootProject.layout.buildDirectory.dir("api")
+    val licenseFile = rootProject.file("LICENSE")
 
-    //mod jar
-    jar {
+    //dev jar
+    named<Jar>("jar") {
+        archiveBaseName.set(base.archivesName)
+        archiveVersion.set(project.version.toString())
+        archiveClassifier.set("dev")
+        destinationDirectory.set(layout.buildDirectory.dir("devlibs"))
+
+        from(mainSourceSet.output)
+        from(licenseFile)
+
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+
+    //mod jar : remap still needed on versions below 26.1
+    named<RemapJarTask>("remapJar") {
+        archiveBaseName.set(base.archivesName)
+        archiveVersion.set(project.version.toString())
+        archiveClassifier.set("")
         destinationDirectory.set(modOutputDir)
-        from(mainSourceSet.output) //grab from combined api + main source-sets
+
+        dependsOn(named("jar"))
     }
 
     //api jar
     register<Jar>("apiJar") {
+        archiveBaseName.set(base.archivesName)
+        archiveVersion.set(project.version.toString())
         archiveClassifier.set("api")
         destinationDirectory.set(apiOutputDir)
+
         from(apiSourceSet.output)
+        from(licenseFile)
+
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     }
 
     //api-source jar
     register<Jar>("apiSourcesJar") {
+        archiveBaseName.set(base.archivesName)
+        archiveVersion.set(project.version.toString())
         archiveClassifier.set("api-sources")
         destinationDirectory.set(apiOutputDir)
+
         from(apiSourceSet.allSource)
+        from(licenseFile)
+
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     }
 
     assemble {
-        dependsOn(jar)
-        dependsOn("apiJar")
-        dependsOn("apiSourcesJar")
+        dependsOn(named("remapJar"))
+        dependsOn(named("apiJar"))
+        dependsOn(named("apiSourcesJar"))
     }
 }
 
 artifacts {
-    add("archives", tasks.named("jar"))
+    add("archives", tasks.named("remapJar"))
     add("archives", tasks.named("apiJar"))
     add("archives", tasks.named("apiSourcesJar"))
 }
@@ -112,7 +140,7 @@ publishing {
             artifactId = base.archivesName.get()
             version = project.version.toString()
 
-            from(components["java"])
+            artifact(tasks.named("remapJar"))
         }
 
         create<MavenPublication>("mavenApi") {

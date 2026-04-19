@@ -7,11 +7,11 @@ plugins {
 group = "net.edeenmc"
 version = BuildTools.createVersionString(project)
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
-    options.release.set(25)
+    options.release.set(21)
 }
 
 tasks.withType<GenerateModuleMetadata>().configureEach {

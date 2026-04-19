@@ -59,7 +59,6 @@ public class BBE implements ClientModInitializer {
         public static boolean limitVanillaSignRendering = false;
     }
 
-
     public static class ModCompact {
         private static ImmutableList<String> modList = ImmutableList.of(
                 "entity_model_features",
@@ -97,7 +96,6 @@ public class BBE implements ClientModInitializer {
             return FabricLoader.getInstance().isModLoaded(id);
         }
     }
-
 
     /* global logger, used for info logging, error handling, etc... */
     public static Logger getLogger() {

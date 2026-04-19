@@ -7,14 +7,9 @@ import betterblockentities.mixin.model.modelpart.ModelPartAccessor;
 
 /* minecraft */
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
-import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
-import net.minecraft.client.renderer.block.dispatch.SingleVariant;
+import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.SimpleModelWrapper;
-import net.minecraft.client.resources.model.geometry.BakedQuad;
-import net.minecraft.client.resources.model.geometry.QuadCollection;
-import net.minecraft.client.resources.model.sprite.Material;
+import net.minecraft.client.resources.model.QuadCollection;
 import net.minecraft.util.RandomSource;
 
 /* mojang */
@@ -36,7 +31,7 @@ public class MultiPartBlockModel implements BlockStateModel {
         generateMeshModel(root, sprite, stack);
     }
 
-    public MultiPartBlockModel(List<BlockStateModelPart> parts) {
+    public MultiPartBlockModel(List<BlockModelPart> parts) {
         constructSingleVariants(parts);
     }
 
@@ -69,7 +64,7 @@ public class MultiPartBlockModel implements BlockStateModel {
      * if there are any nested children in this part, this should traverse all of them
      */
     private void bakePartToQuads(ModelPart part, List<BakedQuad> outputQuads, TextureAtlasSprite sprite, PoseStack stack) {
-            ModelUtility.toBakedQuads(part, outputQuads, sprite, stack);
+        ModelUtility.toBakedQuads(part, outputQuads, sprite, stack);
     }
 
     private QuadCollection toUnculledCollection(List<BakedQuad> quads) {
@@ -80,8 +75,8 @@ public class MultiPartBlockModel implements BlockStateModel {
         return builder.build();
     }
 
-    private void constructSingleVariants(List<BlockStateModelPart> parts) {
-        for (BlockStateModelPart variant : parts) {
+    private void constructSingleVariants(List<BlockModelPart> parts) {
+        for (BlockModelPart variant : parts) {
             models.add(new SingleVariant(variant));
         }
     }
@@ -95,7 +90,7 @@ public class MultiPartBlockModel implements BlockStateModel {
     }
 
     @Override
-    public void collectParts(@NonNull RandomSource randomSource, @NonNull List<BlockStateModelPart> list) {
+    public void collectParts(RandomSource randomSource, List<BlockModelPart> list) {
         if (models.isEmpty()) return;
 
         long seed = randomSource.nextLong();
@@ -107,12 +102,7 @@ public class MultiPartBlockModel implements BlockStateModel {
     }
 
     @Override
-    public Material.Baked particleMaterial() {
+    public TextureAtlasSprite particleIcon() {
         return null;
-    }
-
-    @Override
-    public @BakedQuad.MaterialFlags int materialFlags() {
-        return 0;
     }
 }
