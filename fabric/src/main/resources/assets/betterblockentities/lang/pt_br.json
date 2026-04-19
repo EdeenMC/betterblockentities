@@ -25,6 +25,15 @@
   "bbe.config.storage.main.optimize.bed": "Otimizar Cama",
   "bbe.config.storage.main.optimize.bed.tooltip": "Usado para Ativar ou Desativar as otimizações de Cama",
 
+  "bbe.config.storage.main.optimize.shelf": "Otimizar Estante",
+  "bbe.config.storage.main.optimize.shelf.tooltip": "Usado para Ativar ou Desativar as otimizações de Estante",
+
+  "bbe.config.storage.main.optimize.campfire": "Otimizar Fogueira",
+  "bbe.config.storage.main.optimize.campfire.tooltip": "Usado para Ativar ou Desativar as otimizações de Fogueira",
+
+  "bbe.config.storage.main.optimize.copper_golem_statue": "Otimizar Estátua de Golem de Cobre",
+  "bbe.config.storage.main.optimize.copper_golem_statue.tooltip": "Usado para Ativar ou Desativar as otimizações de Estátua de Golem de Cobre",
+
   "bbe.config.storage.main.animation.chest": "Animar Baú",
   "bbe.config.storage.main.animation.chest.tooltip": "Usado para Ativar ou Desativar as animações de Baú",
 
@@ -40,9 +49,6 @@
   "bbe.config.storage.main.misc.banner_graphics": "Gráficos do Estandarte",
   "bbe.config.storage.main.misc.banner_graphics.tooltip": "Define qual o tipo de passe de renderização os estandartes serão renderizados (Rápido = recorte, Elegante = translúcido)",
 
-  "bbe.config.storage.main.misc.banner_graphics.type.fast": "Rápido",
-  "bbe.config.storage.main.misc.banner_graphics.type.fancy": "Elegante",
-
   "bbe.config.storage.main.misc.christmas_chest": "Baú de Natal",
   "bbe.config.storage.main.misc.christmas_chest.tooltip": "Usado para Ativar ou Desativar as texturas de Natal para baús",
 
@@ -55,10 +61,22 @@
   "bbe.config.storage.main.misc.sign_text_distance": "Distância de renderização do texto da Placa",
   "bbe.config.storage.main.misc.sign_text_distance.tooltip": "Decide a que distância (em blocos) começar a renderizar o texto da placa",
 
+  "bbe.config.storage.main.misc.sign_text_culling": "Descarte do Texto da Placa",
+  "bbe.config.storage.main.misc.sign_text_culling.tooltip": "Ignora a renderização do texto da placa no lado que não está visível. Usado para Ativar ou Desativar o descarte do texto da parte traseira da placa.",
+
   "bbe.config.storage.main.misc.update_scheduler": "Agendador de Atualizações",
   "bbe.config.storage.main.misc.update_scheduler.tooltip": "Determina qual agendador de atualização usar, Inteligente atualiza entidades de blocos com base em vários fatores como visibilidade (sem atualizações instantâneas) enquanto Rápido atualiza imediatamente",
-  "bbe.config.storage.main.misc.update_scheduler.tooltip_notavailable" : "Esta opção não está disponível porque o mod EMF está carregado!",
+  "bbe.config.storage.main.misc.update_scheduler.tooltip_notavailable": "Esta opção não está disponível porque o mod EMF está carregado!",
 
   "bbe.config.storage.main.misc.update_scheduler.type.fast": "Rápido",
-  "bbe.config.storage.main.misc.update_scheduler.type.smart": "Inteligente"
+  "bbe.config.storage.main.misc.update_scheduler.type.smart": "Inteligente",
+
+  "bbe.config.storage.main.misc.banner_graphics.type.fast": "Rápido",
+  "bbe.config.storage.main.misc.banner_graphics.type.fancy": "Elegante",
+
+  "bbe.config.storage.main.misc.item_mesh_type.type.fast" : "Rápido",
+  "bbe.config.storage.main.misc.item_mesh_type.type.fancy" : "Elegante",
+
+  "bbe.config.storage.main.misc.banner_pose": "Pose do Estandarte",
+  "bbe.config.storage.main.misc.banner_pose.tooltip": "Rotaciona o canvas/tela do estandarte para uma posição predefinida"
 }
