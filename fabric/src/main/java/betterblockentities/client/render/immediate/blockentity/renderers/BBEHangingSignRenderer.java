@@ -1,6 +1,7 @@
 package betterblockentities.client.render.immediate.blockentity.renderers;
 
 /* minecraft */
+import betterblockentities.client.BBE;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.model.Model;
@@ -34,6 +35,7 @@ import com.mojang.math.Axis;
 /* java/misc */
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import com.google.common.collect.ImmutableMap;
@@ -46,25 +48,49 @@ public class BBEHangingSignRenderer extends BBEAbstractSignRenderer {
 
     public BBEHangingSignRenderer(BlockEntityRendererProvider.Context context) {
         super(context);
-        Stream<BBEHangingSignRenderer.ModelKey> stream = WoodType.values()
-                .flatMap(
-                        woodType -> Arrays.stream(BBEHangingSignRenderer.AttachmentType.values()).map(attachmentType -> new BBEHangingSignRenderer.ModelKey(woodType, attachmentType))
-                );
-        this.hangingSignModels = (Map<BBEHangingSignRenderer.ModelKey, Model.Simple>)stream.collect(
-                ImmutableMap.toImmutableMap(modelKey -> modelKey, modelKey -> createSignModel(context.entityModelSet(), modelKey.woodType, modelKey.attachmentType))
-        );
+
+        /* filter out invalid sign types to prevent crashes, types in general are irrelevant in our render context */
+        this.hangingSignModels = WoodType.values()
+                .flatMap(woodType ->
+                        Arrays.stream(BBEHangingSignRenderer.AttachmentType.values())
+                                .map(attachmentType -> {
+                                    Model.Simple model = createSignModel(
+                                            context.entityModelSet(),
+                                            woodType,
+                                            attachmentType
+                                    );
+                                    return model == null
+                                            ? null
+                                            : Map.entry(new BBEHangingSignRenderer.ModelKey(woodType, attachmentType), model);
+                                })
+                )
+                .filter(Objects::nonNull)
+                .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     private static ModelLayerLocation createLocation(String string, String string2) {
-        return new ModelLayerLocation(Identifier.withDefaultNamespace(string), string2);
+        ModelLayerLocation layer;
+        try {
+            layer = new ModelLayerLocation(Identifier.withDefaultNamespace(string), string2);
+            return layer;
+        } catch (Exception e) {
+            BBE.getLogger().error("Error creating model for {}", string);
+            return null;
+        }
     }
 
     public static ModelLayerLocation createHangingSignModelName(WoodType woodType, BBEHangingSignRenderer.AttachmentType attachmentType) {
-        return createLocation("hanging_sign/" + woodType.name() + "/" + attachmentType.getSerializedName(), "main");
+        ModelLayerLocation layer = createLocation("hanging_sign/" + woodType.name() + "/" + attachmentType.getSerializedName(), "main");
+        return layer;
     }
 
     public static Model.Simple createSignModel(EntityModelSet entityModelSet, WoodType woodType, BBEHangingSignRenderer.AttachmentType attachmentType) {
-        return new Model.Simple(entityModelSet.bakeLayer(createHangingSignModelName(woodType, attachmentType)), RenderTypes::entityCutoutNoCull);
+        ModelLayerLocation layer = createHangingSignModelName(woodType, attachmentType);
+
+        if (layer != null) {
+            return new Model.Simple(entityModelSet.bakeLayer(layer), RenderTypes::entityCutoutNoCull);
+        }
+        return null;
     }
 
     @Override

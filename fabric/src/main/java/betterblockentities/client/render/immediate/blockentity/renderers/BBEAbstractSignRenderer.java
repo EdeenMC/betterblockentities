@@ -4,6 +4,7 @@ package betterblockentities.client.render.immediate.blockentity.renderers;
 import betterblockentities.client.BBE;
 import betterblockentities.client.gui.config.ConfigCache;
 import betterblockentities.client.render.immediate.OverlayRenderer;
+import betterblockentities.client.render.immediate.blockentity.manager.SpecialBlockEntityManager;
 import betterblockentities.mixin.render.immediate.blockentity.BlockEntityRenderStateAccessor;
 
 /* minecraft */
@@ -132,9 +133,9 @@ public abstract class BBEAbstractSignRenderer implements BlockEntityRenderer<Sig
             return;
         }
 
-        /* remove text filtering as it adds a bit of overhead */
-        final boolean hasFront = hasAnyText(state.frontText, false);
-        final boolean hasBack  = hasAnyText(state.backText, false);
+        /* rerun this check again for modded environments that "skips" our premature check before state creation/extraction */
+        final boolean hasFront = SpecialBlockEntityManager.hasAnyText(state.frontText, false);
+        final boolean hasBack  = SpecialBlockEntityManager.hasAnyText(state.backText, false);
         if (!hasFront && !hasBack) return;
 
         final BlockPos bp = state.blockPos;
@@ -174,15 +175,6 @@ public abstract class BBEAbstractSignRenderer implements BlockEntityRenderer<Sig
             submitSignText(state, poseStack, collector, false);
             poseStack.popPose();
         }
-    }
-
-    private static boolean hasAnyText(SignText text, boolean filtered) {
-        if (text == null) return false;
-        Component[] lines = text.getMessages(filtered);
-        for (int i = 0; i < 4; i++) {
-            if (!lines[i].getString().isEmpty()) return true;
-        }
-        return false;
     }
 
     private void submitSignText(SignRenderState signRenderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, boolean bl) {

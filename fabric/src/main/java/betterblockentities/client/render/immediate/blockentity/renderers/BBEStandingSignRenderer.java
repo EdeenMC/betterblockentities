@@ -1,6 +1,7 @@
 package betterblockentities.client.render.immediate.blockentity.renderers;
 
 /* minecraft */
+import betterblockentities.client.BBE;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.model.Model;
@@ -37,15 +38,22 @@ public class BBEStandingSignRenderer extends BBEAbstractSignRenderer {
     private static final Vec3 TEXT_OFFSET = new Vec3(0.0, 0.33333334F, 0.046666667F);
     private final Map<WoodType, BBEStandingSignRenderer.Models> signModels;
 
+    /* filter out invalid sign types to prevent crashes, types in general are irrelevant in our render context */
     public BBEStandingSignRenderer(BlockEntityRendererProvider.Context context) {
         super(context);
-        this.signModels = (Map<WoodType, BBEStandingSignRenderer.Models>)WoodType.values()
-                .collect(
-                        ImmutableMap.toImmutableMap(
-                                woodType -> woodType,
-                                woodType -> new BBEStandingSignRenderer.Models(createSignModel(context.entityModelSet(), woodType, true), createSignModel(context.entityModelSet(), woodType, false))
-                        )
-                );
+        this.signModels = WoodType.values()
+                .<Map.Entry<WoodType, BBEStandingSignRenderer.Models>>mapMulti((woodType, consumer) -> {
+                    Model.Simple standing = createSignModel(context.entityModelSet(), woodType, true);
+                    Model.Simple wall = createSignModel(context.entityModelSet(), woodType, false);
+
+                    if (standing != null && wall != null) {
+                        consumer.accept(Map.entry(
+                                woodType,
+                                new BBEStandingSignRenderer.Models(standing, wall)
+                        ));
+                    }
+                })
+                .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     @Override
@@ -88,8 +96,14 @@ public class BBEStandingSignRenderer extends BBEAbstractSignRenderer {
     }
 
     public static Model.Simple createSignModel(EntityModelSet entityModelSet, WoodType woodType, boolean bl) {
-        ModelLayerLocation modelLayerLocation = bl ? ModelLayers.createStandingSignModelName(woodType) : ModelLayers.createWallSignModelName(woodType);
-        return new Model.Simple(entityModelSet.bakeLayer(modelLayerLocation), RenderTypes::entityCutoutNoCull);
+        ModelLayerLocation modelLayerLocation;
+        try {
+            modelLayerLocation = bl ? ModelLayers.createStandingSignModelName(woodType) : ModelLayers.createWallSignModelName(woodType);
+            return new Model.Simple(entityModelSet.bakeLayer(modelLayerLocation), RenderTypes::entityCutoutNoCull);
+        } catch(Exception e) {
+            BBE.getLogger().error("Error creating standing sign model for wood type {}", woodType.name());
+            return null;
+        }
     }
 
     @Environment(EnvType.CLIENT)
