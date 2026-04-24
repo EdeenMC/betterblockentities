@@ -471,15 +471,15 @@ public final class BBEEmitter {
 
     private static @Nullable BlockEntity tryGetBlockEntity(BlockPos pos, BlockAndTintGetter level, LevelSlice slice) {
         try {
-            return AltRenderers.hasRendererOverride(
-                    level.getBlockEntity(pos).getType()) ?
-                    null : level.getBlockEntity(pos);
+            BlockEntity blockEntity = level.getBlockEntity(pos);
+            if (blockEntity == null) return null;
+            return AltRenderers.hasRendererOverride(blockEntity.getType()) ? null : blockEntity;
         } catch (Exception e) {
             BBE.getLogger().error("Failed to get block entity at {}. Attempting fallback.", pos, e);
             try {
-                return AltRenderers.hasRendererOverride(
-                        slice.getBlockEntity(pos).getType()) ?
-                        null : slice.getBlockEntity(pos);
+                BlockEntity blockEntity = level.getBlockEntity(pos);
+                if (blockEntity == null) return null;
+                return AltRenderers.hasRendererOverride(blockEntity.getType()) ? null : blockEntity;
             } catch (Throwable t) {
                 BBE.getLogger().error("Fallback failed! This block entity will be skipped and not added to this mesh!", t);
                 return null;
