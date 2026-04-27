@@ -1,6 +1,7 @@
 package betterblockentities.client.render.immediate.blockentity.renderers;
 
 /* minecraft */
+import betterblockentities.client.BBE;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -21,6 +22,7 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.resources.model.sprite.SpriteGetter;
 import net.minecraft.client.resources.model.sprite.SpriteId;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Unit;
 import net.minecraft.world.level.block.PlainSignBlock;
 import net.minecraft.world.level.block.StandingSignBlock;
@@ -44,7 +46,6 @@ import java.util.Map;
 import com.google.common.collect.ImmutableMap;
 
 public class BBEStandingSignRenderer extends BBEAbstractSignRenderer<StandingSignRenderState> {
-    private static final float RENDER_SCALE = 0.6666667F;
     private static final Vector3fc TEXT_OFFSET = new Vector3f(0.0F, 0.33333334F, 0.046666667F);
     public static final WallAndGroundTransformations<SignRenderState.SignTransformations> TRANSFORMATIONS = new WallAndGroundTransformations<>(
             BBEStandingSignRenderer::createWallTransformation, BBEStandingSignRenderer::createGroundTransformation, 16
@@ -53,21 +54,24 @@ public class BBEStandingSignRenderer extends BBEAbstractSignRenderer<StandingSig
 
     public BBEStandingSignRenderer(final BlockEntityRendererProvider.Context context) {
         super(context);
-        this.signModels = (Map<WoodType, BBEStandingSignRenderer.Models>)WoodType.values()
-                .collect(ImmutableMap.toImmutableMap(type -> type, type -> BBEStandingSignRenderer.Models.create(context, type)));
+
+        /* filter out invalid sign types to prevent crashes, types in general are irrelevant in our render context */
+        this.signModels = WoodType.values()
+                .<Map.Entry<WoodType, BBEStandingSignRenderer.Models>>mapMulti((woodType, consumer) -> {
+                    BBEStandingSignRenderer.Models models = BBEStandingSignRenderer.Models.create(context, woodType);
+
+                    if (models.standing() != null && models.wall() != null) {
+                        consumer.accept(Map.entry(woodType, models));
+                    }
+                })
+                .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     public StandingSignRenderState createRenderState() {
         return new StandingSignRenderState();
     }
 
-    public void extractRenderState(
-            final SignBlockEntity blockEntity,
-            final StandingSignRenderState state,
-            final float partialTicks,
-            final Vec3 cameraPosition,
-            final ModelFeatureRenderer.CrumblingOverlay breakProgress
-    ) {
+    public void extractRenderState(final SignBlockEntity blockEntity, final StandingSignRenderState state, final float partialTicks, final Vec3 cameraPosition, final ModelFeatureRenderer.CrumblingOverlay breakProgress) {
         super.extractRenderState(blockEntity, state, partialTicks, cameraPosition, breakProgress);
         BlockState blockState = blockEntity.getBlockState();
         state.attachmentType = PlainSignBlock.getAttachmentPoint(blockState);
@@ -124,35 +128,35 @@ public class BBEStandingSignRenderer extends BBEAbstractSignRenderer<StandingSig
         return createTransformations(PlainSignBlock.Attachment.WALL, direction.toYRot());
     }
 
-    public static void submitSpecial(
-            final SpriteGetter sprites,
-            final PoseStack poseStack,
-            final SubmitNodeCollector submitNodeCollector,
-            final int lightCoords,
-            final int overlayCoords,
-            final Model.Simple model,
-            final SpriteId sprite
-    ) {
-        submitNodeCollector.submitModel(model, Unit.INSTANCE, poseStack, lightCoords, overlayCoords, -1, sprite, sprites, 0, null);
-    }
-
     public static Model.Simple createSignModel(final EntityModelSet entityModelSet, final WoodType woodType, final PlainSignBlock.Attachment attachment) {
         ModelLayerLocation layer = switch (attachment) {
-            case GROUND -> ModelLayers.createStandingSignModelName(woodType);
-            case WALL -> ModelLayers.createWallSignModelName(woodType);
+            case GROUND -> createStandingSignModelName(woodType);
+            case WALL -> createWallSignModelName(woodType);
         };
-        return new Model.Simple(entityModelSet.bakeLayer(layer), RenderTypes::entityCutout);
+
+        if (layer != null) {
+            return new Model.Simple(entityModelSet.bakeLayer(layer), RenderTypes::entityCutout);
+        }
+        return null;
     }
 
-    public static LayerDefinition createSignLayer(final boolean standing) {
-        MeshDefinition mesh = new MeshDefinition();
-        PartDefinition root = mesh.getRoot();
-        root.addOrReplaceChild("sign", CubeListBuilder.create().texOffs(0, 0).addBox(-12.0F, -14.0F, -1.0F, 24.0F, 12.0F, 2.0F), PartPose.ZERO);
-        if (standing) {
-            root.addOrReplaceChild("stick", CubeListBuilder.create().texOffs(0, 14).addBox(-1.0F, -2.0F, -1.0F, 2.0F, 14.0F, 2.0F), PartPose.ZERO);
-        }
+    public static ModelLayerLocation createStandingSignModelName(final WoodType type) {
+        return createLocation("sign/standing/" + type.name(), "main");
+    }
 
-        return LayerDefinition.create(mesh, 64, 32);
+    public static ModelLayerLocation createWallSignModelName(final WoodType type) {
+        return createLocation("sign/wall/" + type.name(), "main");
+    }
+
+    private static ModelLayerLocation createLocation(final String model, final String layerId) {
+        ModelLayerLocation layer;
+        try {
+            layer = new ModelLayerLocation(Identifier.withDefaultNamespace(model), layerId);
+            return layer;
+        } catch (Exception e) {
+            BBE.getLogger().error("Error creating model for {}", model);
+            return null;
+        }
     }
 
     private record Models(Model.Simple standing, Model.Simple wall) {

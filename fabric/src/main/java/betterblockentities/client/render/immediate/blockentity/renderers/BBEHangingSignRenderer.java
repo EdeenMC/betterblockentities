@@ -1,8 +1,10 @@
 package betterblockentities.client.render.immediate.blockentity.renderers;
 
 /* minecraft */
+import betterblockentities.client.BBE;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.EntityModelSet;
+import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
@@ -20,6 +22,7 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.resources.model.sprite.SpriteGetter;
 import net.minecraft.client.resources.model.sprite.SpriteId;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Unit;
 import net.minecraft.world.level.block.CeilingHangingSignBlock;
 import net.minecraft.world.level.block.HangingSignBlock;
@@ -39,20 +42,15 @@ import com.mojang.math.Transformation;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
+
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
+
 import com.google.common.collect.ImmutableMap;
+import org.jspecify.annotations.Nullable;
 
 public class BBEHangingSignRenderer extends BBEAbstractSignRenderer<HangingSignRenderState> {
-    private static final String PLANK = "plank";
-    private static final String V_CHAINS = "vChains";
-    private static final String NORMAL_CHAINS = "normalChains";
-    private static final String CHAIN_L_1 = "chainL1";
-    private static final String CHAIN_L_2 = "chainL2";
-    private static final String CHAIN_R_1 = "chainR1";
-    private static final String CHAIN_R_2 = "chainR2";
-    private static final String BOARD = "board";
-    private static final float MODEL_RENDER_SCALE = 1.0F;
-    private static final float TEXT_RENDER_SCALE = 0.9F;
     private static final Vector3fc TEXT_OFFSET = new Vector3f(0.0F, -0.32F, 0.073F);
     public static final WallAndGroundTransformations<SignRenderState.SignTransformations> TRANSFORMATIONS = new WallAndGroundTransformations<>(
             BBEHangingSignRenderer::createWallTransformation, BBEHangingSignRenderer::createGroundTransformation, 16
@@ -61,21 +59,24 @@ public class BBEHangingSignRenderer extends BBEAbstractSignRenderer<HangingSignR
 
     public BBEHangingSignRenderer(final BlockEntityRendererProvider.Context context) {
         super(context);
-        this.signModels = (Map<WoodType, BBEHangingSignRenderer.Models>)WoodType.values()
-                .collect(ImmutableMap.toImmutableMap(type -> type, type -> BBEHangingSignRenderer.Models.create(context, type)));
+
+        /* filter out invalid sign types to prevent crashes, types in general are irrelevant in our render context */
+        this.signModels = WoodType.values()
+                .<Map.Entry<WoodType, BBEHangingSignRenderer.Models>>mapMulti((woodType, consumer) -> {
+                    BBEHangingSignRenderer.Models models = BBEHangingSignRenderer.Models.create(context, woodType);
+
+                    if (models.ceiling() != null && models.ceilingMiddle() != null && models.wall() != null) {
+                        consumer.accept(Map.entry(woodType, models));
+                    }
+                })
+                .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     public HangingSignRenderState createRenderState() {
         return new HangingSignRenderState();
     }
 
-    public void extractRenderState(
-            final SignBlockEntity blockEntity,
-            final HangingSignRenderState state,
-            final float partialTicks,
-            final Vec3 cameraPosition,
-            final ModelFeatureRenderer.CrumblingOverlay breakProgress
-    ) {
+    public void extractRenderState(final SignBlockEntity blockEntity, final HangingSignRenderState state, final float partialTicks, final Vec3 cameraPosition, final ModelFeatureRenderer.CrumblingOverlay breakProgress) {
         super.extractRenderState(blockEntity, state, partialTicks, cameraPosition, breakProgress);
         BlockState blockState = blockEntity.getBlockState();
         state.attachmentType = HangingSignBlock.getAttachmentPoint(blockState);
@@ -87,7 +88,27 @@ public class BBEHangingSignRenderer extends BBEAbstractSignRenderer<HangingSignR
     }
 
     public static Model.Simple createSignModel(final EntityModelSet entityModelSet, final WoodType woodType, final HangingSignBlock.Attachment attachmentType) {
-        return new Model.Simple(entityModelSet.bakeLayer(ModelLayers.createHangingSignModelName(woodType, attachmentType)), RenderTypes::entityCutout);
+        ModelLayerLocation layer = createHangingSignModelName(woodType, attachmentType);
+
+        if (layer != null) {
+            return new Model.Simple(entityModelSet.bakeLayer(layer), RenderTypes::entityCutout);
+        }
+        return null;
+    }
+
+    private static ModelLayerLocation createLocation(final String model, final String layerId) {
+        ModelLayerLocation layer;
+        try {
+            layer = new ModelLayerLocation(Identifier.withDefaultNamespace(model), layerId);
+            return layer;
+        } catch (Exception e) {
+            BBE.getLogger().error("Error creating model for {}", model);
+            return null;
+        }
+    }
+
+    public static ModelLayerLocation createHangingSignModelName(final WoodType type, final HangingSignBlock.Attachment attachmentType) {
+        return createLocation("hanging_sign/" + type.name() + "/" + attachmentType.getSerializedName(), "main");
     }
 
     private static Matrix4f baseTransformation(final float angle) {
@@ -129,57 +150,6 @@ public class BBEHangingSignRenderer extends BBEAbstractSignRenderer<HangingSignR
     @Override
     protected SpriteId getSignSprite(final WoodType type) {
         return Sheets.getHangingSignSprite(type);
-    }
-
-    public static void submitSpecial(
-            final SpriteGetter sprites,
-            final PoseStack poseStack,
-            final SubmitNodeCollector submitNodeCollector,
-            final int lightCoords,
-            final int overlayCoords,
-            final Model.Simple model,
-            final SpriteId sprite
-    ) {
-        submitNodeCollector.submitModel(model, Unit.INSTANCE, poseStack, lightCoords, overlayCoords, -1, sprite, sprites, 0, null);
-    }
-
-    public static LayerDefinition createHangingSignLayer(final HangingSignBlock.Attachment type) {
-        MeshDefinition mesh = new MeshDefinition();
-        PartDefinition root = mesh.getRoot();
-        root.addOrReplaceChild("board", CubeListBuilder.create().texOffs(0, 12).addBox(-7.0F, 0.0F, -1.0F, 14.0F, 10.0F, 2.0F), PartPose.ZERO);
-        if (type == HangingSignBlock.Attachment.WALL) {
-            root.addOrReplaceChild("plank", CubeListBuilder.create().texOffs(0, 0).addBox(-8.0F, -6.0F, -2.0F, 16.0F, 2.0F, 4.0F), PartPose.ZERO);
-        }
-
-        if (type == HangingSignBlock.Attachment.WALL || type == HangingSignBlock.Attachment.CEILING) {
-            PartDefinition normalChains = root.addOrReplaceChild("normalChains", CubeListBuilder.create(), PartPose.ZERO);
-            normalChains.addOrReplaceChild(
-                    "chainL1",
-                    CubeListBuilder.create().texOffs(0, 6).addBox(-1.5F, 0.0F, 0.0F, 3.0F, 6.0F, 0.0F),
-                    PartPose.offsetAndRotation(-5.0F, -6.0F, 0.0F, 0.0F, (float) (-Math.PI / 4), 0.0F)
-            );
-            normalChains.addOrReplaceChild(
-                    "chainL2",
-                    CubeListBuilder.create().texOffs(6, 6).addBox(-1.5F, 0.0F, 0.0F, 3.0F, 6.0F, 0.0F),
-                    PartPose.offsetAndRotation(-5.0F, -6.0F, 0.0F, 0.0F, (float) (Math.PI / 4), 0.0F)
-            );
-            normalChains.addOrReplaceChild(
-                    "chainR1",
-                    CubeListBuilder.create().texOffs(0, 6).addBox(-1.5F, 0.0F, 0.0F, 3.0F, 6.0F, 0.0F),
-                    PartPose.offsetAndRotation(5.0F, -6.0F, 0.0F, 0.0F, (float) (-Math.PI / 4), 0.0F)
-            );
-            normalChains.addOrReplaceChild(
-                    "chainR2",
-                    CubeListBuilder.create().texOffs(6, 6).addBox(-1.5F, 0.0F, 0.0F, 3.0F, 6.0F, 0.0F),
-                    PartPose.offsetAndRotation(5.0F, -6.0F, 0.0F, 0.0F, (float) (Math.PI / 4), 0.0F)
-            );
-        }
-
-        if (type == HangingSignBlock.Attachment.CEILING_MIDDLE) {
-            root.addOrReplaceChild("vChains", CubeListBuilder.create().texOffs(14, 6).addBox(-6.0F, -6.0F, 0.0F, 12.0F, 6.0F, 0.0F), PartPose.ZERO);
-        }
-
-        return LayerDefinition.create(mesh, 64, 32);
     }
 
     private record Models(Model.Simple ceiling, Model.Simple ceilingMiddle, Model.Simple wall) {
