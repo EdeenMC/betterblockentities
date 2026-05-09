@@ -3,7 +3,7 @@
   "id": "betterblockentities",
   "version": "${version}",
 
-  "name": "BBE",
+  "name": "Better Block Entities",
   "description": "Optimize and customize block entity rendering with a more modern approach.",
   "authors": [
     "ceeden"
