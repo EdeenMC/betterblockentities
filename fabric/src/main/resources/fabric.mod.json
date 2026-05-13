@@ -38,6 +38,12 @@
     "optifabric": "*"
   },
   "custom": {
-
+    "modmenu": {
+      "links": {
+        "modmenu.curseforge": "https://www.curseforge.com/minecraft/mc-mods/better-block-entities",
+        "modmenu.modrinth": "https://modrinth.com/mod/better-block-entities",
+        "modmenu.discord": "https://discord.gg/NdX9BYpTtz"
+      }
+    }
   }
 }
