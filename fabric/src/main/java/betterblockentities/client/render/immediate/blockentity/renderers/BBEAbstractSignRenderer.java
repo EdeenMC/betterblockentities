@@ -5,6 +5,7 @@ import betterblockentities.client.BBE;
 import betterblockentities.client.gui.config.ConfigCache;
 import betterblockentities.client.render.immediate.OverlayRenderer;
 import betterblockentities.client.render.immediate.blockentity.manager.SpecialBlockEntityManager;
+import betterblockentities.client.compat.ModCompat;
 import betterblockentities.mixin.render.immediate.blockentity.BlockEntityRenderStateAccessor;
 
 /* minecraft */
@@ -73,7 +74,7 @@ public abstract class BBEAbstractSignRenderer<S extends SignRenderState> impleme
             poseStack.popPose();
         }
         manageCrumblingOverlay(state, poseStack);
-        renderCulledText(state, cameraRenderState, bs, signBlock, poseStack, submitNodeCollector);
+        if(!ModCompat.isShadowPass()) renderCulledText(state, cameraRenderState, bs, signBlock, poseStack, submitNodeCollector); // Rendering sign text during the shadow pass is useless and performance-heavy
     }
 
     @Unique

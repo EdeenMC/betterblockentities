@@ -15,6 +15,9 @@ object BuildConfig {
     //because of the different artifact naming schemes
     const val SODIUM_VERSION: String = "0.8.12-beta.2+mc26.1.2"
 
+    //iris version
+    const val IRIS_VERSION: String = "1.10.9+26.1-fabric"
+
     //BBE mod version (remember to bump!!!)
     const val MOD_VERSION: String = "1.3.4"
 }
