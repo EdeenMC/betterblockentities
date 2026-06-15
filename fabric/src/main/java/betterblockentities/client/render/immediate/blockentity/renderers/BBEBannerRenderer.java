@@ -4,6 +4,7 @@ package betterblockentities.client.render.immediate.blockentity.renderers;
 import betterblockentities.client.gui.config.ConfigCache;
 import betterblockentities.client.render.immediate.OverlayRenderer;
 import betterblockentities.client.render.immediate.blockentity.extentions.BlockEntityRenderStateExt;
+import betterblockentities.client.compat.ModCompat;
 
 /* minecraft */
 import net.minecraft.client.model.Model;
@@ -196,6 +197,7 @@ public class BBEBannerRenderer implements BlockEntityRenderer<BannerBlockEntity,
                 breakProgress
         );
 
+        if(ModCompat.isShadowPass()) return; // Rendering every pattern layer during the shadow pass is useless
         for (int maskIndex = 0; maskIndex < 16 && maskIndex < patterns.layers().size(); maskIndex++) {
             BannerPatternLayers.Layer layer = (BannerPatternLayers.Layer)patterns.layers().get(maskIndex);
             SpriteId sprite = banner ? Sheets.getBannerSprite(layer.pattern()) : Sheets.getShieldSprite(layer.pattern());

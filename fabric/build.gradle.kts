@@ -39,6 +39,7 @@ repositories {
     maven("https://maven.fabricmc.net/")
     maven("https://maven.caffeinemc.net/releases")
     maven("https://maven.caffeinemc.net/snapshots")
+    maven("https://api.modrinth.com/maven")
     mavenCentral()
 }
 
@@ -48,6 +49,7 @@ dependencies {
 
     implementation("net.fabricmc:fabric-loader:${BuildConfig.FABRIC_LOADER_VERSION}")
     implementation("net.caffeinemc:sodium-fabric:${BuildConfig.SODIUM_VERSION}")
+    compileOnly("maven.modrinth:iris:${BuildConfig.IRIS_VERSION}")
 
     fabricModule("fabric-block-getter-api-v2")
     fabricModule("fabric-renderer-api-v1")
