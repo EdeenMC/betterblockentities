@@ -39,6 +39,7 @@
     "accessors.AbstractBlockRenderContextAccessor",
     "sodium.pipeline.BlockRendererMixin",
     "accessors.RenderSectionAccessor",
+    "sodium.pipeline.ChunkBuilderMeshingTaskMixin",
     "sodium.render.RenderSectionManagerMixin",
     "sodium.render.SodiumWorldRendererMixin",
     "sodium.translucent_sorting.InnerPartitionBSPNodeMixin",
