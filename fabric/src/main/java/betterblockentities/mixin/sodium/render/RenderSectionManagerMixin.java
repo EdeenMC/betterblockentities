@@ -16,13 +16,13 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(RenderSectionManager.class)
 public class RenderSectionManagerMixin {
-    @Redirect(method = "processChunkBuilds", at = @At(value = "INVOKE", target = "Lnet/caffeinemc/mods/sodium/client/render/chunk/compile/BuilderTaskOutput;destroy()V"))
+    @Redirect(method = "uploadChunks", at = @At(value = "INVOKE", target = "Lnet/caffeinemc/mods/sodium/client/render/chunk/compile/BuilderTaskOutput;destroy()V"))
     private void bbe$callback(BuilderTaskOutput out) {
         out.destroy();
 
         if (SectionRebuildCallbacks.isEmpty()) return;
 
-        RenderSection section = out.section;
+        RenderSection section = out.render;
         RenderSectionAccessor accessor = (RenderSectionAccessor) section;
 
         long key = SectionRebuildCallbacks.keyFromSectionPos(accessor.bbe$getChunkX(), accessor.bbe$getChunkY(), accessor.bbe$getChunkZ());
