@@ -35,6 +35,7 @@
     "resource.ReloadableResourceManagerMixin",
     "sodium.config.ConfigMixin",
     "sodium.pipeline.BlockRendererMixin",
+    "sodium.pipeline.ChunkBuilderMeshingTaskMixin",
     "sodium.render.RenderSectionManagerMixin",
     "sodium.render.SodiumWorldRendererMixin",
     "sodium.translucent_sorting.InnerPartitionBSPNodeMixin",

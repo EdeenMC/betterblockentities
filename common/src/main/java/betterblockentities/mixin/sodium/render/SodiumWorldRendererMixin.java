@@ -6,6 +6,7 @@ import betterblockentities.platform.GlobalScope;
 import betterblockentities.render.AltRenderers;
 import betterblockentities.client.render.immediate.blockentity.extentions.BlockEntityExt;
 import betterblockentities.client.render.immediate.blockentity.manager.SpecialBlockEntityManager;
+import betterblockentities.client.render.immediate.blockentity.manager.SodiumBlockEntityCulling;
 
 /* minecraft */
 import net.minecraft.client.Camera;
@@ -28,15 +29,44 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /* java/misc */
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+import it.unimi.dsi.fastutil.longs.LongSet;
 import java.util.List;
 import java.util.SortedSet;
 
 @Pseudo
 @Mixin(SodiumWorldRenderer.class)
 public abstract class SodiumWorldRendererMixin {
+    @Unique private static final ThreadLocal<LongSet> bbe$extracted_breaking_states = ThreadLocal.withInitial(LongOpenHashSet::new);
+
+    @Inject(method = "extractBlockEntities", at = @At("HEAD"))
+    private void resetExtractedBreakingStates(Camera camera, float tickDelta, Long2ObjectMap<SortedSet<BlockDestructionProgress>> progression, LevelRenderState levelRenderState, CallbackInfo ci) {
+        bbe$extracted_breaking_states.get().clear();
+    }
+
+    @Inject(method = "extractBlockEntities", at = @At("TAIL"))
+    private void extractTerrainBreakingStates(Camera camera, float tickDelta, Long2ObjectMap<SortedSet<BlockDestructionProgress>> progression, LevelRenderState levelRenderState, CallbackInfo ci) {
+        if (progression.isEmpty() || Minecraft.getInstance().level == null) return;
+
+        LongSet extracted = bbe$extracted_breaking_states.get();
+        try {
+            for (long posAsLong : progression.keySet()) {
+                BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(BlockPos.of(posAsLong));
+                if (!extracted.contains(posAsLong) && SodiumBlockEntityCulling.needsSeparateBreakingState(blockEntity)) {
+                    this.extractBlockEntity(blockEntity, new PoseStack(), camera, tickDelta, progression, levelRenderState, false);
+                }
+            }
+        } finally {
+            extracted.clear();
+        }
+    }
+
     /**
      * @author ceeden
      * @reason We overwrite this because we don't want other mods in here, this is a critical mixin that
@@ -45,6 +75,14 @@ public abstract class SodiumWorldRendererMixin {
      */
     @Overwrite
     private void extractBlockEntity(BlockEntity blockEntity, PoseStack poseStack, Camera camera, float tickDelta, Long2ObjectMap<SortedSet<BlockDestructionProgress>> progression, LevelRenderState levelRenderState, boolean globalBlockEntity) {
+        BlockEntityExt ext = (BlockEntityExt) blockEntity;
+        boolean managed = this.bbe$shouldManage(ext);
+        boolean hasAltRenderers = AltRenderers.renderersLoaded();
+
+        if (managed && !ext.bbe$hasSpecialManager() && progression.isEmpty() && !hasAltRenderers) {
+            return;
+        }
+
         final BlockPos blockPos = blockEntity.getBlockPos();
         final SortedSet<BlockDestructionProgress> sortedSet = progression.get(blockPos.asLong());
 
@@ -62,8 +100,12 @@ public abstract class SodiumWorldRendererMixin {
             crumblingOverlay = null;
         }
 
+        if (crumblingOverlay != null) {
+            bbe$extracted_breaking_states.get().add(blockPos.asLong());
+        }
+
         /* extract our registered alt renderers for this block entity */
-        if (AltRenderers.renderersLoaded()) {
+        if (hasAltRenderers) {
             List<BlockEntityRenderState> altBlockEntityRenderStates =
                     GlobalScope.altRenderDispatcher.tryExtractRenderStates(blockEntity, tickDelta, crumblingOverlay);
             for (BlockEntityRenderState altState : altBlockEntityRenderStates) {
@@ -74,8 +116,7 @@ public abstract class SodiumWorldRendererMixin {
         }
 
         /* manage this block entity if optimizations for it is turned on */
-        BlockEntityExt ext = (BlockEntityExt)blockEntity;
-        if (this.bbe$shouldManage(ext, crumblingOverlay)) {
+        if (managed && crumblingOverlay == null) {
             if (ext.bbe$hasSpecialManager()) {
                 BlockEntityRenderState managedState =
                         SpecialBlockEntityManager.extractManagedState(blockEntity, levelRenderState.cameraRenderState, tickDelta, crumblingOverlay, globalBlockEntity);
@@ -96,10 +137,9 @@ public abstract class SodiumWorldRendererMixin {
     }
 
     @Unique
-    private boolean bbe$shouldManage(BlockEntityExt ext, ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
+    private boolean bbe$shouldManage(BlockEntityExt ext) {
         return ext.bbe$isSupportedBlockEntity()                               &&
                 BBEConfig.OptEnabledTable.ENABLED[ext.bbe$getOptKind() & 0xFF] &&
-                ext.bbe$isTerrainMeshReady()                                  &&
-                crumblingOverlay == null;
+                ext.bbe$isTerrainMeshReady();
     }
 }
