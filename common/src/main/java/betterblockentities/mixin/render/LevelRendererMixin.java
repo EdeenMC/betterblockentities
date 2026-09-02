@@ -2,7 +2,6 @@ package betterblockentities.mixin.render;
 
 /* local */
 import betterblockentities.client.gui.config.BBEConfig;
-import betterblockentities.client.render.immediate.blockentity.extentions.BlockEntityExt;
 import betterblockentities.client.render.immediate.blockentity.extentions.BlockEntityRenderStateExt;
 import betterblockentities.client.render.immediate.blockentity.misc.RenderingMode;
 import betterblockentities.client.render.immediate.overlay.OverlayRenderer;
@@ -17,7 +16,6 @@ import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.state.level.LevelRenderState;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
 
 /* mojang */
@@ -54,13 +52,10 @@ public class LevelRendererMixin {
     private void bbe$submitBreakingOverlays(BlockEntityRenderDispatcher instance, BlockEntityRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera, Operation<Void> original) {
         BlockEntityRenderStateExt renderStateExt = (BlockEntityRenderStateExt)state;
 
-        BlockEntity blockEntity = renderStateExt.bbe$getBlockEntity();
-        BlockEntityExt blockEntityExt = (BlockEntityExt)blockEntity;
-
-        if (blockEntityExt.bbe$isSupportedBlockEntity() &&
-            BBEConfig.OptEnabledTable.ENABLED[blockEntityExt.bbe$getOptKind() & 0xFF] &&
-            blockEntityExt.bbe$getRenderingMode() == RenderingMode.TERRAIN &&
-            blockEntityExt.bbe$isTerrainMeshReady() &&
+        if (renderStateExt.bbe$isSupportedBlockEntity() &&
+            BBEConfig.OptEnabledTable.ENABLED[renderStateExt.bbe$getOptKind() & 0xFF] &&
+            renderStateExt.bbe$getRenderingMode() == RenderingMode.TERRAIN &&
+            renderStateExt.bbe$isTerrainMeshReady() &&
             state.breakProgress != null)
         {
             OverlayRenderer.submitCrumblingOverlay(instance, state, poseStack, camera);
