@@ -2,10 +2,10 @@ package betterblockentities.client.render.immediate.overlay;
 
 /* local */
 import betterblockentities.client.render.immediate.blockentity.extentions.BlockEntityRenderStateExt;
-
-/* minecraft */
 import betterblockentities.client.render.immediate.blockentity.manager.InstancedBlockEntityManager;
 import betterblockentities.platform.GlobalScope;
+
+/* minecraft */
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.object.banner.BannerFlagModel;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
