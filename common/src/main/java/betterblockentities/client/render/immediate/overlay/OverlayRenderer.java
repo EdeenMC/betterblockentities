@@ -4,6 +4,7 @@ package betterblockentities.client.render.immediate.overlay;
 import betterblockentities.client.render.immediate.blockentity.extentions.BlockEntityRenderStateExt;
 
 /* minecraft */
+import betterblockentities.client.render.immediate.blockentity.manager.InstancedBlockEntityManager;
 import betterblockentities.platform.GlobalScope;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.object.banner.BannerFlagModel;
@@ -15,8 +16,6 @@ import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.ModelBakery;
-import net.minecraft.world.level.block.entity.BannerBlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntity;
 
 /* mojang */
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -26,11 +25,10 @@ public final class OverlayRenderer {
 
     public static void submitCrumblingOverlay(BlockEntityRenderDispatcher dispatcher, BlockEntityRenderState state, PoseStack poseStack, CameraRenderState camera) {
         BlockEntityRenderStateExt renderStateExt = (BlockEntityRenderStateExt) state;
-        BlockEntity blockEntity = renderStateExt.bbe$getBlockEntity();
 
         OverlayNodeStorage.SubmitParameters parameters;
 
-        if (blockEntity instanceof BannerBlockEntity) {
+        if (renderStateExt.bbe$getOptKind() == InstancedBlockEntityManager.OptKind.BANNER) {
             parameters = new OverlayNodeStorage.SubmitParameters(
                     call -> call.model() instanceof BannerFlagModel ?
                     new OverlayNodeStorage.SubmitResolution(
