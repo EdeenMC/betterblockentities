@@ -2,6 +2,7 @@ package betterblockentities.client.chunk.pipeline;
 
 /* local */
 import betterblockentities.client.chunk.util.ModelResourceUtil;
+import betterblockentities.client.compat.SableCompat;
 import betterblockentities.client.gui.config.BBEConfig;
 import betterblockentities.client.gui.config.ConfigCache;
 import betterblockentities.client.gui.option.EnumTypes;
@@ -79,6 +80,12 @@ public final class BBEBlockRenderer {
         }
 
         if (AltRenderers.hasRendererOverride(blockEntity.getType())) {
+            return;
+        }
+
+        // Sable compat: never bake sublevel (contraption) block entities into main-world
+        // Sodium terrain. Sable renders its plots with its own dispatcher + vanilla BERs.
+        if (SableCompat.isOnSubLevel(blockEntity)) {
             return;
         }
 

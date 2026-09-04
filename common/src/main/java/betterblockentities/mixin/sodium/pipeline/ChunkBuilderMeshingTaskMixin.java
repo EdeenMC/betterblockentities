@@ -2,6 +2,7 @@ package betterblockentities.mixin.sodium.pipeline;
 
 /* local */
 import betterblockentities.client.chunk.pipeline.BBEBlockRenderer;
+import betterblockentities.client.compat.SableCompat;
 import betterblockentities.client.render.immediate.blockentity.extentions.BlockEntityExt;
 
 /* minecraft */
@@ -46,6 +47,12 @@ public abstract class ChunkBuilderMeshingTaskMixin {
         final BlockEntity blockEntity = BBEBlockRenderer.tryGetBlockEntity(slice, blockPos);
         if (blockEntity == null || !(blockEntity instanceof BlockEntityExt ext) || !ext.supportedBlockEntity()) {
             return RenderShape.INVISIBLE;
+        }
+
+        // Sable compat: leave sublevel block entities at their vanilla render shape.
+        // They are rendered by Sable's own dispatcher, not Sodium main-world terrain.
+        if (SableCompat.isOnSubLevel(blockEntity)) {
+            return renderShape;
         }
 
         return RenderShape.MODEL;
