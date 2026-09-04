@@ -1,6 +1,7 @@
 package betterblockentities.mixin.render.immediate.blockentity;
 
 /* local */
+import betterblockentities.client.compat.SableCompat;
 import betterblockentities.client.gui.config.BBEConfig;
 import betterblockentities.client.render.immediate.blockentity.extentions.BlockEntityExt;
 import betterblockentities.client.render.immediate.blockentity.manager.InstancedBlockEntityManager;
@@ -79,7 +80,7 @@ public abstract class BlockEntityRenderDispatcherMixin {
         }
 
         BlockEntityExt ext = (BlockEntityExt)entity;
-        if (shouldManage(ext)) {
+        if (shouldManage(entity)) {
             boolean cancel = !ext.hasSpecialManager() || !SpecialBlockEntityManager.shouldRender(entity);
             if (CrumblingRenderContext.isActive()) {
                 renderCrumblingOnly(entity, tickDelta, matrices, consumer);
@@ -106,7 +107,13 @@ public abstract class BlockEntityRenderDispatcherMixin {
     }
 
     @Unique
-    private static boolean shouldManage(BlockEntityExt ext) {
+    private static boolean shouldManage(BlockEntity blockEntity) {
+        // Sable compat: sublevel (contraption) block entities are rendered by Sable's own
+        // dispatcher and never baked into Sodium terrain, so never cull their BER path.
+        if (SableCompat.isOnSubLevel(blockEntity)) {
+            return false;
+        }
+        BlockEntityExt ext = (BlockEntityExt) blockEntity;
         return ext.terrainRenderingReady()
                 && BBEConfig.OptEnabledTable.ENABLED[ext.optKind() & 0xFF];
     }
@@ -124,7 +131,7 @@ public abstract class BlockEntityRenderDispatcherMixin {
             Operation<Void> original
     ) {
         BlockEntityExt ext = (BlockEntityExt) blockEntity;
-        if (!shouldManage(ext)
+        if (!shouldManage(blockEntity)
                 || ext.optKind() != InstancedBlockEntityManager.OptKind.SIGN
                 || AltRenderers.hasRendererOverride(blockEntity.getType())) {
             original.call(blockEntity, runnable);

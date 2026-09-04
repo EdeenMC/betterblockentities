@@ -2,6 +2,7 @@ package betterblockentities.client.render.immediate.blockentity.misc;
 
 /* local */
 import betterblockentities.client.chunk.section.SectionUpdateDispatcher;
+import betterblockentities.client.compat.SableCompat;
 import betterblockentities.client.gui.config.ConfigCache;
 import betterblockentities.client.render.immediate.blockentity.extentions.BlockEntityExt;
 import betterblockentities.client.render.immediate.util.BlockVisibilityChecker;
@@ -70,7 +71,9 @@ public class LidControllerSync {
         ext.terrainMeshReady(false);
         ext.renderingMode(RenderingMode.IMMEDIATE);
 
-        if (requiresRebuild) {
+        // Sable compat: sublevel chests already render via vanilla BER; their plot
+        // positions are not part of main-world Sodium terrain, so skip the rebuild.
+        if (requiresRebuild && !SableCompat.isOnSubLevel(blockEntity)) {
             SectionUpdateDispatcher.queueRebuildAtBlockPos(blockEntity.getBlockPos());
         }
     }

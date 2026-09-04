@@ -4,6 +4,7 @@ package betterblockentities.client.render.immediate.blockentity.manager;
 import betterblockentities.platform.GlobalScope;
 import betterblockentities.render.AltRenderers;
 import betterblockentities.client.chunk.section.SectionUpdateDispatcher;
+import betterblockentities.client.compat.SableCompat;
 import betterblockentities.client.gui.config.BBEConfig;
 import betterblockentities.client.gui.config.ConfigCache;
 import betterblockentities.client.gui.option.EnumTypes;
@@ -97,6 +98,18 @@ public final class InstancedBlockEntityManager {
      *   FINISHED   -> safe to remove from queue
      */
     public int run() {
+        // Sable compat: sublevel (contraption) block entities are rendered by Sable itself.
+        // Keep them on the vanilla BER path and never queue main-world terrain rebuilds
+        // for their plot positions.
+        if (SableCompat.isOnSubLevel(blockEntity)) {
+            if (ext.renderingMode() != RenderingMode.IMMEDIATE) {
+                ext.renderingMode(RenderingMode.IMMEDIATE);
+            }
+            ext.terrainMeshReady(false);
+            phase = Phase.IDLE;
+            return ManagerTasks.FINISHED;
+        }
+
         if (!ext.supportedBlockEntity()
                 || !BBEConfig.OptEnabledTable.ENABLED[ext.optKind() & 0xFF]
                 || AltRenderers.hasRendererOverride(blockEntity.getType())) {
@@ -135,6 +148,16 @@ public final class InstancedBlockEntityManager {
      * Called from block entity animation tickers each tick to update animation state
      */
     public void tick(boolean animState, boolean animOption) {
+        // Sable compat: no BBE state tracking needed on sublevels; vanilla BER always renders.
+        if (SableCompat.isOnSubLevel(blockEntity)) {
+            this.setAnimating(false);
+            if (ext.renderingMode() != RenderingMode.IMMEDIATE) {
+                ext.renderingMode(RenderingMode.IMMEDIATE);
+            }
+            ext.terrainMeshReady(false);
+            return;
+        }
+
         if (!animOption) {
             this.setAnimating(false);
             return;
@@ -153,6 +176,16 @@ public final class InstancedBlockEntityManager {
      * Called by event-driven animations (e.g., Decorated Pots)
      */
     public void trigger(float start, float duration, boolean animOption) {
+        // Sable compat: keep sublevel block entities on the vanilla path, no scheduling.
+        if (SableCompat.isOnSubLevel(blockEntity)) {
+            this.setAnimating(false);
+            if (ext.renderingMode() != RenderingMode.IMMEDIATE) {
+                ext.renderingMode(RenderingMode.IMMEDIATE);
+            }
+            ext.terrainMeshReady(false);
+            return;
+        }
+
         if (!animOption) {
             this.setAnimating(false);
             return;
