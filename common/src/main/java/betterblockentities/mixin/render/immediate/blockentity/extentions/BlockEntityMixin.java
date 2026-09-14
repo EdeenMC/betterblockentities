@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.Unique;
 public abstract class BlockEntityMixin implements BlockEntityExt {
     @Unique private RenderingMode renderingMode = RenderingMode.TERRAIN;
     @Unique private boolean terrainMeshReady = true;
+    @Unique private boolean terrainRendererAvailable = false;
     @Unique private boolean hasSpecialManager = false;
     @Unique private byte bbeKind = 0;
     @Unique private boolean supportedBlockEntity = false;
@@ -38,6 +39,12 @@ public abstract class BlockEntityMixin implements BlockEntityExt {
         updateTerrainRenderingReady();
     }
 
+    @Override public boolean terrainRendererAvailable() { return terrainRendererAvailable; }
+    @Override public void terrainRendererAvailable(boolean available) {
+        terrainRendererAvailable = available;
+        updateTerrainRenderingReady();
+    }
+
     @Override public boolean terrainRenderingReady() { return terrainRenderingReady; }
 
     @Override public boolean hasSpecialManager() { return hasSpecialManager; }
@@ -48,6 +55,7 @@ public abstract class BlockEntityMixin implements BlockEntityExt {
 
     @Unique private void updateTerrainRenderingReady() {
         terrainRenderingReady = supportedBlockEntity
+                && terrainRendererAvailable
                 && terrainMeshReady
                 && renderingMode == RenderingMode.TERRAIN;
     }

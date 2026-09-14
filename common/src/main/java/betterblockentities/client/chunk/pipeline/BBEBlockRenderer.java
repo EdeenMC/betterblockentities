@@ -82,6 +82,10 @@ public final class BBEBlockRenderer {
             return;
         }
 
+        /* BBE geometry is only added by this Sodium chunk-meshing path. Other terrain pipelines,
+         * such as Sable's sub-level renderer, must retain immediate block-entity rendering. */
+        ext.terrainRendererAvailable(true);
+
         this.emitter.bind(quadEmitter);
 
         if (ConfigCache.shadeMode == EnumTypes.ShadeMode.VANILLA.ordinal()) {

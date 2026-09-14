@@ -98,6 +98,7 @@ public final class InstancedBlockEntityManager {
      */
     public int run() {
         if (!ext.supportedBlockEntity()
+                || !ext.terrainRendererAvailable()
                 || !BBEConfig.OptEnabledTable.ENABLED[ext.optKind() & 0xFF]
                 || AltRenderers.hasRendererOverride(blockEntity.getType())) {
             phase = Phase.IDLE;
