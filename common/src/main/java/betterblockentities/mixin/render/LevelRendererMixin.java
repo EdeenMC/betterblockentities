@@ -57,7 +57,7 @@ public class LevelRendererMixin {
         BlockEntity blockEntity = renderStateExt.bbe$getBlockEntity();
         BlockEntityExt blockEntityExt = (BlockEntityExt)blockEntity;
 
-        if (blockEntityExt.bbe$isSupportedBlockEntity() &&
+        if (blockEntityExt != null && blockEntityExt.bbe$isSupportedBlockEntity() &&
             BBEConfig.OptEnabledTable.ENABLED[blockEntityExt.bbe$getOptKind() & 0xFF] &&
             blockEntityExt.bbe$getRenderingMode() == RenderingMode.TERRAIN &&
             blockEntityExt.bbe$isTerrainMeshReady() &&
