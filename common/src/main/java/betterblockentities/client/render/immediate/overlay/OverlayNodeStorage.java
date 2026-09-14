@@ -4,12 +4,6 @@ package betterblockentities.client.render.immediate.overlay;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.renderer.SubmitNodeCollection;
 import net.minecraft.client.renderer.SubmitNodeStorage;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-
-/* mojang */
-import com.mojang.blaze3d.vertex.PoseStack;
 
 /* java/misc */
 import java.util.ArrayDeque;
@@ -21,33 +15,6 @@ public class OverlayNodeStorage extends SubmitNodeStorage {
     @Override
     public SubmitNodeCollection order(final int order) {
         return this.submitsPerOrder.computeIfAbsent(order, ignored -> new OverlayNodeCollection(order, this.stack));
-    }
-
-    @Override
-    public <S> void submitModel(
-            Model<? super S> model,
-            S state,
-            PoseStack poseStack,
-            RenderType renderType,
-            int lightCoords,
-            int overlayCoords,
-            int tintedColor,
-            TextureAtlasSprite sprite,
-            int outlineColor,
-            ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
-    ) {
-        this.order(0).submitModel(
-                model,
-                state,
-                poseStack,
-                renderType,
-                lightCoords,
-                overlayCoords,
-                tintedColor,
-                sprite,
-                outlineColor,
-                crumblingOverlay
-        );
     }
 
     public static final class SubmitStack {

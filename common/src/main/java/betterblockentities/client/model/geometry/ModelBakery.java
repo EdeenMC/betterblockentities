@@ -117,8 +117,8 @@ public class ModelBakery {
 
     private static void setupCopperGolemStatue(ModelLayerLocation layer, ModelPart root, PoseStack stack) {
         stack.pushPose();
-        stack.mulPose(Axis.XP.rotationDegrees(180));
-        stack.mulPose(Axis.YP.rotationDegrees(180));
+        stack.rotateDegrees(Axis.XP, 180);
+        stack.rotateDegrees(Axis.YP, 180);
         GeometryRegistry.cacheGeometry(layer, root, PlaceHolderSpriteIdentifiers.COPPER_GOLEM_STATUE, stack);
         stack.popPose();
     }

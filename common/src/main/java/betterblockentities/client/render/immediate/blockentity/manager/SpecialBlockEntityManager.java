@@ -22,6 +22,8 @@ import net.minecraft.world.phys.Vec3;
 /* java/misc */
 import org.jspecify.annotations.Nullable;
 
+import java.util.List;
+
 /**
  * Special cases where we might need special behavior : push the render-state at all times etc...
  */
@@ -166,8 +168,8 @@ public final class SpecialBlockEntityManager {
                 return editorState;
             }
 
-            boolean hasFront = hasAnyText(blockEntity.getFrontText(), false);
-            boolean hasBack  = hasAnyText(blockEntity.getBackText(), false);
+            boolean hasFront = hasAnyText(blockEntity.getText(SignTextSlot.FRONT), false);
+            boolean hasBack  = hasAnyText(blockEntity.getText(SignTextSlot.BACK), false);
 
             if (!hasFront && !hasBack) {
                 return null;
@@ -218,10 +220,16 @@ public final class SpecialBlockEntityManager {
         }
 
         private static boolean hasAnyText(SignText text, boolean filtered) {
-            if (text == null) return false;
-            Component[] lines = text.getMessages(filtered);
-            for (int i = 0; i < 4; i++) {
-                if (!lines[i].getString().isEmpty()) return true;
+            if (text == null) {
+                return false;
+            }
+
+            List<Component> lines = text.getMessages(filtered);
+
+            for (Component line : lines) {
+                if (!line.getString().isEmpty()) {
+                    return true;
+                }
             }
             return false;
         }

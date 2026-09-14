@@ -9,6 +9,7 @@ import betterblockentities.client.render.immediate.overlay.OverlayRenderer;
 
 /* minecraft */
 import betterblockentities.platform.GlobalScope;
+import com.mojang.renderpearl.api.buffers.GpuBufferSlice;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -21,7 +22,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
 
 /* mojang */
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.resource.GraphicsResourceAllocator;
 import com.mojang.blaze3d.vertex.PoseStack;
 
@@ -40,7 +40,7 @@ import org.joml.Vector4f;
 @Mixin(LevelRenderer.class)
 public class LevelRendererMixin {
     @Inject(at = @At("HEAD"), method = "render")
-    private void bbe$captureFrustum(GraphicsResourceAllocator graphicsResourceAllocator, DeltaTracker deltaTracker, boolean renderBlockOutline, CameraRenderState cameraRenderState, Matrix4fc frustumMatrix, GpuBufferSlice fog, Vector4f clearColor, boolean drawSky, CallbackInfo ci) {
+    private void bbe$captureFrustum(GraphicsResourceAllocator resourceAllocator, boolean renderOutline, CameraRenderState cameraRenderState, GpuBufferSlice terrainFog, Vector4f fogColor, boolean shouldRenderSky, boolean consistentDepthRequired, CallbackInfo ci) {
         GlobalScope.frustum = cameraRenderState.cullFrustum;
         GlobalScope.altRenderDispatcher.prepare(cameraRenderState.pos);
     }
@@ -91,7 +91,7 @@ public class LevelRendererMixin {
 
 
     @Inject(at = @At("TAIL"), method = "render")
-    private void bbe$clearRenderStates(GraphicsResourceAllocator graphicsResourceAllocator, DeltaTracker deltaTracker, boolean renderBlockOutline, CameraRenderState cameraRenderState, Matrix4fc frustumMatrix, GpuBufferSlice fog, Vector4f clearColor, boolean drawSky, CallbackInfo ci) {
+    private void bbe$clearRenderStates(CallbackInfo ci) {
         GlobalScope.altBlockEntityRenderStates.clear();
         GlobalScope.altRenderDispatcher.clearStateRendererPairs();
     }

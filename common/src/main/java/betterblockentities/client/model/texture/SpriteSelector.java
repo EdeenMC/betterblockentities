@@ -4,10 +4,15 @@ package betterblockentities.client.model.texture;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SpriteMapper;
+import net.minecraft.client.renderer.blockentity.DecoratedPotRenderer;
 import net.minecraft.client.renderer.blockentity.state.ChestRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.sprite.SpriteGetter;
 import net.minecraft.client.resources.model.sprite.SpriteId;
 import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.AtlasIds;
 import net.minecraft.resources.Identifier;
@@ -15,6 +20,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.animal.golem.CopperGolemOxidationLevels;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemInstance;
 import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.CopperChestBlock;
 import net.minecraft.world.level.block.CopperGolemStatueBlock;
@@ -33,7 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class SpriteSelector {
     private static final ConcurrentHashMap<Identifier, SpriteId> BANNER_MATERIALS = new ConcurrentHashMap<>();
-    private static final ConcurrentHashMap<Item, SpriteId> DECORATED_POT_MATERIALS = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<ItemInstance, SpriteId> DECORATED_POT_MATERIALS = new ConcurrentHashMap<>();
 
     public static TextureAtlasSprite getBannerPatternSprite(Holder<BannerPattern> holder) {
         Identifier id = holder.value().assetId();
@@ -42,9 +48,10 @@ public class SpriteSelector {
         return getBlockSprite(material.texture());
     }
 
-    public static TextureAtlasSprite getDecoratedPotSideSprite(Optional<Item> optional) {
-        if (optional.isPresent()) {
-            SpriteId material = DECORATED_POT_MATERIALS.computeIfAbsent(optional.get(), SpriteSelector::getDecoratedPotMaterial);
+    public static TextureAtlasSprite getDecoratedPotSideSprite(Optional<? extends ItemInstance> item) {
+        if (item.isPresent()) {
+            SpriteId material = DECORATED_POT_MATERIALS.computeIfAbsent(
+                    item.get(), key -> getDecoratedPotMaterial(Optional.of(key)));
             if (material != null) {
                 return getBlockSprite(material.texture());
             }
@@ -52,20 +59,16 @@ public class SpriteSelector {
         return getBlockSprite(Sheets.DECORATED_POT_SIDE.texture());
     }
 
-    private static SpriteId getDecoratedPotMaterial(Item item) {
-        Optional<ResourceKey<Item>> itemKey = BuiltInRegistries.ITEM.getResourceKey(item);
-        if (itemKey.isEmpty()) {
-            return null;
-        }
-
-        final SpriteId[] result = new SpriteId[1];
-        DecoratedPotPatterns.itemToPatternMappings((mappedItem, pattern) -> {
-            if (mappedItem.equals(itemKey.get())) {
-                Identifier assetId = BuiltInRegistries.DECORATED_POT_PATTERN.getOrThrow(pattern).value().assetId();
-                result[0] = Sheets.DECORATED_POT_MAPPER.apply(assetId);
+    public static SpriteId getDecoratedPotMaterial(Optional<? extends ItemInstance> item) {
+        if (item.isPresent()) {
+            Holder<DecoratedPotPattern> pattern = item.get().get(DataComponents.PROVIDES_POTTERY_PATTERN);
+            if (pattern != null) {
+                return Sheets.DECORATED_POT_MAPPER.apply(pattern.value().assetId());
             }
-        });
-        return result[0];
+            return null;
+        } else {
+            return Sheets.DECORATED_POT_SIDE;
+        }
     }
 
     public static TextureAtlasSprite getCopperGolemStatueSprite(CopperGolemStatueBlock cgsBlock) {
@@ -120,5 +123,11 @@ public class SpriteSelector {
                 .getAtlasManager()
                 .getAtlasOrThrow(AtlasIds.BLOCKS);
         return atlas.getSprite(id);
+    }
+
+    public record PotSideSprite(RenderType renderType, TextureAtlasSprite sprite) {
+        public static PotSideSprite create(final SpriteGetter sprites, final SpriteId spriteId) {
+            return new PotSideSprite(spriteId.renderType(RenderTypes::entitySolid), sprites.get(spriteId));
+        }
     }
 }

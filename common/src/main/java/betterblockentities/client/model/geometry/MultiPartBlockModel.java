@@ -94,7 +94,7 @@ public class MultiPartBlockModel implements BlockStateModel {
                 }
 
                 Material.Baked bakedMat = new Material.Baked(sprite, false);
-                BakedQuad.MaterialInfo matInfo = BakedQuad.MaterialInfo.of(bakedMat, Transparency.NONE, -1, true, 0);
+                BakedQuad.MaterialInfo matInfo = BakedQuad.MaterialInfo.of(bakedMat, Transparency.NONE, -1, null, 0);
 
                 /* assemble quad */
                 BakedQuad baked = new BakedQuad(
