@@ -24,5 +24,5 @@ object BuildConfig {
     const val SODIUM_VERSION: String = "0.8.12+mc1.21.1"
 
     //BBE mod version (remember to bump!!!)
-    const val MOD_VERSION: String = "1.3.4-beta.3"
+    const val MOD_VERSION: String = "1.3.4"
 }
