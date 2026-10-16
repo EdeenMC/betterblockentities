@@ -53,7 +53,7 @@ public class QuadLighter {
                 ? LightCoordsUtil.FULL_BRIGHT
                 : LightCoordsUtil.getLightCoords(LightCoordsUtil.BrightnessGetter.DEFAULT, this.slice, state, pos);
 
-        float brightness = quad.hasShade() ? computeDirectionalLight(quad) : 1.0F;
+        float brightness = emissive ? 1.0F : computeDirectionalLight(quad);
 
         //write brightness/ao
         Arrays.fill(out.br, brightness);

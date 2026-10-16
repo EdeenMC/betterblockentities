@@ -5,10 +5,10 @@ object BuildConfig {
     const val LOOM_VERSION: String = "1.15-SNAPSHOT"
 
     //neoforge gradle plugin
-    const val MODDEV_GRADLE_VERSION: String = "2.0.141"
+    const val MODDEV_GRADLE_VERSION: String = "2.0.147"
 
     //neoforge
-    const val NEOFORGE_VERSION: String = "26.2.0.0-beta"
+    const val NEOFORGE_VERSION: String = "26.3.0.65-beta"
 
     //fabric loader and api version
     const val FABRIC_LOADER_VERSION: String = "0.19.3"
@@ -19,7 +19,7 @@ object BuildConfig {
 
     //sodium version (needs to vary between snapshot builds and releases)
     //because of the different artifact naming schemes
-    const val SODIUM_VERSION: String = "0.9.2+mc26.3"
+    const val SODIUM_VERSION: String = "0.9.3-beta.1+mc26.3"
 
     //BBE mod version (remember to bump!!!)
     const val MOD_VERSION: String = "1.3.9"

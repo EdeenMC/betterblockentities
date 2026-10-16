@@ -9,7 +9,7 @@ modId = "betterblockentities"
 version = "${version}"
 displayName = "BBE"
 
-logoFile = "assets/betterblockentities/icon.png"
+iconFile = "assets/betterblockentities/icon.png"
 
 authors = "Ceeden"
 credits = "Ceeden"
