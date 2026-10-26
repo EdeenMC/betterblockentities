@@ -1,0 +1,88 @@
+{
+  "bbe.config.sodium.pagetext.general" : "一般",
+  "bbe.config.sodium.pagetext.optimizations" : "最佳化",
+  "bbe.config.sodium.pagetext.animations" : "動畫",
+  "bbe.config.sodium.pagetext.advanced" : "進階",
+
+  "bbe.config.storage.main.optimize.master" : "啟用 BBE",
+  "bbe.config.storage.main.optimize.master.tooltip" : "用於開啟或關閉 BBE 及其所有最佳化",
+
+  "bbe.config.storage.main.misc.shademode" : "著色模式",
+  "bbe.config.storage.main.misc.shademode.tooltip" : "選擇用於 BBE 最佳化方塊實體的著色方法。Sodium 模式可能看起來更好，因為它按角而不是按面套用環境遮蔽和光照貼圖，但當方塊實體在原版和 Sodium 渲染之間切換時，可能會導致明顯差異",
+
+  "bbe.config.storage.main.optimize.chest" : "最佳化儲物箱",
+  "bbe.config.storage.main.optimize.chest.tooltip" : "用於開啟或關閉儲物箱最佳化",
+
+  "bbe.config.storage.main.optimize.shulker" : "最佳化界伏盒",
+  "bbe.config.storage.main.optimize.shulker.tooltip" : "用於開啟或關閉界伏盒最佳化",
+
+  "bbe.config.storage.main.optimize.sign" : "最佳化告示牌",
+  "bbe.config.storage.main.optimize.sign.tooltip" : "用於開啟或關閉告示牌最佳化",
+
+  "bbe.config.storage.main.optimize.decoratedpot" : "最佳化裝飾陶罐",
+  "bbe.config.storage.main.optimize.decoratedpot.tooltip" : "用於開啟或關閉裝飾陶罐最佳化",
+
+  "bbe.config.storage.main.optimize.banner" : "最佳化旗幟",
+  "bbe.config.storage.main.optimize.banner.tooltip" : "用於開啟或關閉旗幟最佳化",
+
+  "bbe.config.storage.main.optimize.bell" : "最佳化鐘",
+  "bbe.config.storage.main.optimize.bell.tooltip" : "用於開啟或關閉鐘最佳化",
+
+  "bbe.config.storage.main.optimize.copper_golem_statue" : "最佳化銅魔像雕像",
+  "bbe.config.storage.main.optimize.copper_golem_statue.tooltip" : "用於開啟或關閉銅魔像雕像最佳化",
+
+  "bbe.config.storage.main.optimize.shelf" : "最佳化書架",
+  "bbe.config.storage.main.optimize.shelf.tooltip" : "用於開啟或關閉書架最佳化",
+
+  "bbe.config.storage.main.optimize.campfire" : "最佳化營火",
+  "bbe.config.storage.main.optimize.campfire.tooltip" : "用於開啟或關閉營火最佳化",
+
+  "bbe.config.storage.main.optimize.lectern" : "最佳化講台",
+  "bbe.config.storage.main.optimize.lectern.tooltip" : "用於開啟或關閉講台最佳化",
+
+  "bbe.config.storage.main.animation.chest" : "儲物箱動畫",
+  "bbe.config.storage.main.animation.chest.tooltip" : "用於開啟或關閉儲物箱動畫",
+
+  "bbe.config.storage.main.animation.shulker" : "界伏盒動畫",
+  "bbe.config.storage.main.animation.shulker.tooltip" : "用於開啟或關閉界伏盒動畫",
+
+  "bbe.config.storage.main.animation.bell" : "鐘動畫",
+  "bbe.config.storage.main.animation.bell.tooltip" : "用於開啟或關閉鐘動畫",
+
+  "bbe.config.storage.main.animation.decoratedpot" : "裝飾陶罐動畫",
+  "bbe.config.storage.main.animation.decoratedpot.tooltip" : "用於開啟或關閉裝飾陶罐動畫",
+
+  "bbe.config.storage.main.misc.banner_graphics" : "旗幟圖形",
+  "bbe.config.storage.main.misc.banner_graphics.tooltip" : "決定旗幟應在哪個渲染階段渲染，（快速 = 裁切），（精美 = 半透明）",
+
+  "bbe.config.storage.main.misc.christmas_chest" : "聖誕儲物箱",
+  "bbe.config.storage.main.misc.christmas_chest.tooltip" : "用於開啟或關閉儲物箱的聖誕紋理",
+
+  "bbe.config.storage.main.misc.render_passes" : "額外渲染階段",
+  "bbe.config.storage.main.misc.render_passes.tooltip" : "決定在動畫結束後，方塊實體在其動畫狀態中保留多少個額外渲染階段",
+
+  "bbe.config.storage.main.misc.sign_text" : "告示牌文字",
+  "bbe.config.storage.main.misc.sign_text.tooltip" : "用於開啟或關閉告示牌文字渲染",
+
+  "bbe.config.storage.main.misc.sign_text_distance" : "告示牌文字渲染距離",
+  "bbe.config.storage.main.misc.sign_text_distance.tooltip" : "決定從什麼距離（方塊）開始渲染告示牌文字",
+
+  "bbe.config.storage.main.misc.sign_text_culling" : "告示牌文字剔除",
+  "bbe.config.storage.main.misc.sign_text_culling.tooltip" : "跳過在不可見的一側渲染告示牌文字。用於開啟或關閉告示牌文字背面剔除",
+
+  "bbe.config.storage.main.misc.update_scheduler" : "更新排程器",
+  "bbe.config.storage.main.misc.update_scheduler.tooltip" : "決定使用哪種更新排程器，智慧排程器根據可見性等多種因素更新方塊實體（無直接更新），而快速排程器則立即更新",
+  "bbe.config.storage.main.misc.update_scheduler.tooltip_notavailable" : "此選項無法使用，因為偵測到不相容的模組！",
+
+  "bbe.config.storage.main.misc.update_scheduler.type.fast" : "快速",
+  "bbe.config.storage.main.misc.update_scheduler.type.smart" : "智慧",
+
+  "bbe.config.storage.main.misc.banner_graphics.type.fast" : "快速",
+  "bbe.config.storage.main.misc.banner_graphics.type.fancy" : "精美",
+
+  "bbe.config.storage.main.misc.shademode.type.sodium" : "Sodium",
+  "bbe.config.storage.main.misc.shademode.type.vanilla" : "原版",
+
+  "bbe.config.storage.main.misc.banner_pose" : "旗幟位置",
+  "bbe.config.storage.main.misc.banner_pose.tooltip" : "將旗幟畫布/旗幟旋轉到預設位置"
+}

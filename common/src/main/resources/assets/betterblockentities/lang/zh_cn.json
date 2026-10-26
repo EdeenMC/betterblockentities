@@ -1,0 +1,88 @@
+{
+  "bbe.config.sodium.pagetext.general" : "通用",
+  "bbe.config.sodium.pagetext.optimizations" : "优化",
+  "bbe.config.sodium.pagetext.animations" : "动画",
+  "bbe.config.sodium.pagetext.advanced" : "高级",
+
+  "bbe.config.storage.main.optimize.master" : "启用BBE",
+  "bbe.config.storage.main.optimize.master.tooltip" : "用于开启或关闭BBE及其所有优化",
+
+  "bbe.config.storage.main.misc.shademode" : "着色模式",
+  "bbe.config.storage.main.misc.shademode.tooltip" : "选择用于BBE优化方块实体的着色方法。Sodium模式可能看起来更好，因为它按角而不是按面应用环境遮蔽和光照贴图，但当方块实体在原版和Sodium渲染之间切换时，可能会导致明显差异",
+
+  "bbe.config.storage.main.optimize.chest" : "优化箱子",
+  "bbe.config.storage.main.optimize.chest.tooltip" : "用于开启或关闭箱子优化",
+
+  "bbe.config.storage.main.optimize.shulker" : "优化潜影盒",
+  "bbe.config.storage.main.optimize.shulker.tooltip" : "用于开启或关闭潜影盒优化",
+
+  "bbe.config.storage.main.optimize.sign" : "优化告示牌",
+  "bbe.config.storage.main.optimize.sign.tooltip" : "用于开启或关闭告示牌优化",
+
+  "bbe.config.storage.main.optimize.decoratedpot" : "优化饰纹陶罐",
+  "bbe.config.storage.main.optimize.decoratedpot.tooltip" : "用于开启或关闭饰纹陶罐优化",
+
+  "bbe.config.storage.main.optimize.banner" : "优化旗帜",
+  "bbe.config.storage.main.optimize.banner.tooltip" : "用于开启或关闭旗帜优化",
+
+  "bbe.config.storage.main.optimize.bell" : "优化钟",
+  "bbe.config.storage.main.optimize.bell.tooltip" : "用于开启或关闭钟优化",
+
+  "bbe.config.storage.main.optimize.copper_golem_statue" : "优化铜傀儡雕像",
+  "bbe.config.storage.main.optimize.copper_golem_statue.tooltip" : "用于开启或关闭铜傀儡雕像优化",
+
+  "bbe.config.storage.main.optimize.shelf" : "优化书架",
+  "bbe.config.storage.main.optimize.shelf.tooltip" : "用于开启或关闭书架优化",
+
+  "bbe.config.storage.main.optimize.campfire" : "优化营火",
+  "bbe.config.storage.main.optimize.campfire.tooltip" : "用于开启或关闭营火优化",
+
+  "bbe.config.storage.main.optimize.lectern" : "优化讲台",
+  "bbe.config.storage.main.optimize.lectern.tooltip" : "用于开启或关闭讲台优化",
+
+  "bbe.config.storage.main.animation.chest" : "箱子动画",
+  "bbe.config.storage.main.animation.chest.tooltip" : "用于开启或关闭箱子动画",
+
+  "bbe.config.storage.main.animation.shulker" : "潜影盒动画",
+  "bbe.config.storage.main.animation.shulker.tooltip" : "用于开启或关闭潜影盒动画",
+
+  "bbe.config.storage.main.animation.bell" : "钟动画",
+  "bbe.config.storage.main.animation.bell.tooltip" : "用于开启或关闭钟动画",
+
+  "bbe.config.storage.main.animation.decoratedpot" : "饰纹陶罐动画",
+  "bbe.config.storage.main.animation.decoratedpot.tooltip" : "用于开启或关闭饰纹陶罐动画",
+
+  "bbe.config.storage.main.misc.banner_graphics" : "旗帜图形",
+  "bbe.config.storage.main.misc.banner_graphics.tooltip" : "决定旗帜应在哪个渲染阶段渲染，（快速=切出），（精美=半透明）",
+
+  "bbe.config.storage.main.misc.christmas_chest" : "圣诞箱子",
+  "bbe.config.storage.main.misc.christmas_chest.tooltip" : "用于开启或关闭箱子的圣诞纹理",
+
+  "bbe.config.storage.main.misc.render_passes" : "额外渲染阶段",
+  "bbe.config.storage.main.misc.render_passes.tooltip" : "决定在动画结束后，方块实体在其动画状态中保留多少个额外渲染阶段",
+
+  "bbe.config.storage.main.misc.sign_text" : "告示牌文本",
+  "bbe.config.storage.main.misc.sign_text.tooltip" : "用于开启或关闭告示牌文本渲染",
+
+  "bbe.config.storage.main.misc.sign_text_distance" : "告示牌文本渲染距离",
+  "bbe.config.storage.main.misc.sign_text_distance.tooltip" : "决定从什么距离（方块）开始渲染告示牌文本",
+
+  "bbe.config.storage.main.misc.sign_text_culling" : "告示牌文本剔除",
+  "bbe.config.storage.main.misc.sign_text_culling.tooltip" : "跳过在不可见的一侧渲染告示牌文本。用于开启或关闭告示牌文本背面剔除",
+
+  "bbe.config.storage.main.misc.update_scheduler" : "更新调度器",
+  "bbe.config.storage.main.misc.update_scheduler.tooltip" : "决定使用哪种更新调度器，智能调度器根据可见性等多种因素更新方块实体（无直接更新），而快速调度器则立即更新",
+  "bbe.config.storage.main.misc.update_scheduler.tooltip_notavailable" : "此选项不可用，因为检测到不兼容的模组！",
+
+  "bbe.config.storage.main.misc.update_scheduler.type.fast" : "快速",
+  "bbe.config.storage.main.misc.update_scheduler.type.smart" : "智能",
+
+  "bbe.config.storage.main.misc.banner_graphics.type.fast" : "快速",
+  "bbe.config.storage.main.misc.banner_graphics.type.fancy" : "精美",
+
+  "bbe.config.storage.main.misc.shademode.type.sodium" : "Sodium",
+  "bbe.config.storage.main.misc.shademode.type.vanilla" : "原版",
+
+  "bbe.config.storage.main.misc.banner_pose" : "旗帜位置",
+  "bbe.config.storage.main.misc.banner_pose.tooltip" : "将旗帜画布/旗帜旋转到预设位置"
+}
