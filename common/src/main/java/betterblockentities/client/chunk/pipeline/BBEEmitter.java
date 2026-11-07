@@ -132,9 +132,9 @@ public class BBEEmitter {
             for (int v = 0; v < QUAD_VERTICES; ++v) {
                 Matrix4f matrix = poseStack.last().pose();
 
-                float vX = sodiumEmitter.getX(v);
-                float vY = sodiumEmitter.getY(v);
-                float vZ = sodiumEmitter.getZ(v);
+                float vX = sodiumEmitter.sodium$getX(v);
+                float vY = sodiumEmitter.sodium$getY(v);
+                float vZ = sodiumEmitter.sodium$getZ(v);
 
                 Vector3f pos = matrix.transformPosition(vX, vY, vZ, this.scratchVector);
 

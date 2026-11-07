@@ -33,9 +33,9 @@ public class QuadTransform {
         float sinZ = (float) Math.sin(radZ);
 
         for (int i = 0; i < 4; i++) {
-            float x = quad.getX(i) - centerX;
-            float y = quad.getY(i) - centerY;
-            float z = quad.getZ(i) - centerZ;
+            float x = quad.sodium$getX(i) - centerX;
+            float y = quad.sodium$getY(i) - centerY;
+            float z = quad.sodium$getZ(i) - centerZ;
 
             if (degreesX != 0f) {
                 float newY = y * cosX - z * sinX;
@@ -72,7 +72,7 @@ public class QuadTransform {
         float centerZ = 0.5f;
 
         for (int i = 0; i < 4; i++) {
-            scratchVector.set(quad.getX(i) - centerX, quad.getY(i) - centerY, quad.getZ(i) - centerZ);
+            scratchVector.set(quad.sodium$getX(i) - centerX, quad.sodium$getY(i) - centerY, quad.sodium$getZ(i) - centerZ);
             scratchVector.rotate(rotation);
             quad.setPos(i, scratchVector.x + centerX, scratchVector.y + centerY, scratchVector.z + centerZ);
         }
@@ -82,9 +82,9 @@ public class QuadTransform {
         /* compute quad center */
         float cx = 0, cy = 0, cz = 0;
         for (int i = 0; i < 4; i++) {
-            cx += quad.getX(i);
-            cy += quad.getY(i);
-            cz += quad.getZ(i);
+            cx += quad.sodium$getX(i);
+            cy += quad.sodium$getY(i);
+            cz += quad.sodium$getZ(i);
         }
         cx *= 0.25f;
         cy *= 0.25f;
@@ -96,9 +96,9 @@ public class QuadTransform {
 
         /* compute tangent */
         Vector3f tangent = new Vector3f(
-                quad.getX(1) - quad.getX(0),
-                quad.getY(1) - quad.getY(0),
-                quad.getZ(1) - quad.getZ(0)
+                quad.sodium$getX(1) - quad.sodium$getX(0),
+                quad.sodium$getY(1) - quad.sodium$getY(0),
+                quad.sodium$getZ(1) - quad.sodium$getZ(0)
         );
         tangent.normalize();
 
@@ -115,9 +115,9 @@ public class QuadTransform {
 
         /* move each vertex */
         for (int i = 0; i < 4; i++) {
-            float x = quad.getX(i);
-            float y = quad.getY(i);
-            float z = quad.getZ(i);
+            float x = quad.sodium$getX(i);
+            float y = quad.sodium$getY(i);
+            float z = quad.sodium$getZ(i);
 
             /* local coordinates relative to center */
             float dx = x - cx;
@@ -168,8 +168,8 @@ public class QuadTransform {
         float vNewRange = vNewMax - vNewMin;
 
         for (int i = 0; i < 4; i++) {
-            float uNorm = (mQuad.getTexU(i) - uOldMin) / uOldRange;
-            float vNorm = (mQuad.getTexV(i) - vOldMin) / vOldRange;
+            float uNorm = (mQuad.sodium$getTexU(i) - uOldMin) / uOldRange;
+            float vNorm = (mQuad.sodium$getTexV(i) - vOldMin) / vOldRange;
 
             mQuad.setUV(i,
                     uNewMin + uNorm * uNewRange,

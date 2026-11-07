@@ -19,7 +19,7 @@ object BuildConfig {
 
     //sodium version (needs to vary between snapshot builds and releases)
     //because of the different artifact naming schemes
-    const val SODIUM_VERSION: String = "0.9.3-beta.1+mc26.3"
+    const val SODIUM_VERSION: String = "0.9.3-beta.3+mc26.3"
 
     //BBE mod version (remember to bump!!!)
     const val MOD_VERSION: String = "1.4.0"
