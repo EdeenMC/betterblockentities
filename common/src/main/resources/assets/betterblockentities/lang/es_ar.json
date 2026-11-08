@@ -1,0 +1,88 @@
+{
+  "bbe.config.sodium.pagetext.general" : "General", 
+  "bbe.config.sodium.pagetext.optimizations" : "Optimizaciones",
+  "bbe.config.sodium.pagetext.animations" : "Animaciones",
+  "bbe.config.sodium.pagetext.advanced" : "Avanzado",
+
+  "bbe.config.storage.main.optimize.master" : "Activar BBE",
+  "bbe.config.storage.main.optimize.master.tooltip" : "Activa o desactiva BBE y todas sus optimizaciones",
+
+  "bbe.config.storage.main.misc.shademode" : "Modo de sombreado",
+  "bbe.config.storage.main.misc.shademode.tooltip" : "Selecciona el método de sombreado que se usará para las entidades de bloque optimizadas por BBE. Aunque Sodium puede verse mejor porque aplica la oclusión ambiental y los mapas de luz por esquina en lugar de por cara, esto puede generar una diferencia visible cuando las entidades de bloque cambian entre el renderizado de Vanilla y el de Sodium",
+
+  "bbe.config.storage.main.optimize.chest" : "Optimizar cofres",
+  "bbe.config.storage.main.optimize.chest.tooltip" : "Activa o desactiva las optimizaciones de cofres",
+
+  "bbe.config.storage.main.optimize.shulker" : "Optimizar cajas de shulker",
+  "bbe.config.storage.main.optimize.shulker.tooltip" : "Activa o desactiva las optimizaciones de cajas de shulker",
+
+  "bbe.config.storage.main.optimize.sign" : "Optimizar carteles",
+  "bbe.config.storage.main.optimize.sign.tooltip" : "Activa o desactiva las optimizaciones de carteles",
+
+  "bbe.config.storage.main.optimize.decoratedpot" : "Optimizar macetas decoradas",
+  "bbe.config.storage.main.optimize.decoratedpot.tooltip" : "Activa o desactiva las optimizaciones de macetas decoradas",
+
+  "bbe.config.storage.main.optimize.banner" : "Optimizar estandartes",
+  "bbe.config.storage.main.optimize.banner.tooltip" : "Activa o desactiva las optimizaciones de estandartes",
+
+  "bbe.config.storage.main.optimize.bell" :  "Optimizar campanas",
+  "bbe.config.storage.main.optimize.bell.tooltip" : "Activa o desactiva las optimizaciones de campanas",
+
+  "bbe.config.storage.main.optimize.copper_golem_statue" : "Optimizar estatuas de gólem de cobre",
+  "bbe.config.storage.main.optimize.copper_golem_statue.tooltip" : "Activa o desactiva las optimizaciones de estatuas de gólem de cobre",
+
+  "bbe.config.storage.main.optimize.shelf" : "Optimizar estantes",
+  "bbe.config.storage.main.optimize.shelf.tooltip" : "Activa o desactiva las optimizaciones de estantes",
+
+  "bbe.config.storage.main.optimize.campfire" : "Optimizar fogatas",
+  "bbe.config.storage.main.optimize.campfire.tooltip" : "Activa o desactiva las optimizaciones de fogatas",
+
+  "bbe.config.storage.main.optimize.lectern" : "Optimizar atriles",
+  "bbe.config.storage.main.optimize.lectern.tooltip" : "Activa o desactiva las optimizaciones de atriles",
+
+  "bbe.config.storage.main.animation.chest" : "Animar cofres",
+  "bbe.config.storage.main.animation.chest.tooltip" : "Activa o desactiva las animaciones de cofres",
+
+  "bbe.config.storage.main.animation.shulker" : "Animar cajas de shulker",
+  "bbe.config.storage.main.animation.shulker.tooltip" : "Activa o desactiva las animaciones de cajas de shulker",
+
+  "bbe.config.storage.main.animation.bell" : "Animar campanas",
+  "bbe.config.storage.main.animation.bell.tooltip" : "Activa o desactiva las animaciones de campanas",
+
+  "bbe.config.storage.main.animation.decoratedpot" : "Animar macetas decoradas",
+  "bbe.config.storage.main.animation.decoratedpot.tooltip" : "Activa o desactiva las animaciones de macetas decoradas",
+
+  "bbe.config.storage.main.misc.banner_graphics" : "Gráficos de estandartes",
+  "bbe.config.storage.main.misc.banner_graphics.tooltip" : "Determina en qué etapa de renderizado se dibujarán los estandartes. (Rápido = recorte), (Fabuloso = translúcido)",
+
+  "bbe.config.storage.main.misc.christmas_chest" : "Cofres navideños",
+  "bbe.config.storage.main.misc.christmas_chest.tooltip" : "Activa o desactiva las texturas navideñas de los cofres",
+
+  "bbe.config.storage.main.misc.render_passes" : "Etapas de renderizado adicionales",
+  "bbe.config.storage.main.misc.render_passes.tooltip" : "Determina durante cuántas etapas de renderizado adicionales se mantendrá una entidad de bloque en estado de animación después de que termine la animación",
+
+  "bbe.config.storage.main.misc.sign_text" : "Texto de los carteles",
+  "bbe.config.storage.main.misc.sign_text.tooltip" : "Activa o desactiva el renderizado del texto de los carteles",
+
+  "bbe.config.storage.main.misc.sign_text_distance" : "Distancia de renderizado del texto de los carteles",
+  "bbe.config.storage.main.misc.sign_text_distance.tooltip" : "Determina a qué distancia (en bloques) comenzará a renderizarse el texto de los carteles",
+
+  "bbe.config.storage.main.misc.sign_text_culling" : "Culling de caras posteriores del texto de los carteles",
+  "bbe.config.storage.main.misc.sign_text_culling.tooltip" : "Permite activar o desactivar el culling de las caras posteriores del texto de los carteles.",
+
+  "bbe.config.storage.main.misc.update_scheduler" : "Sistema de actualización",
+  "bbe.config.storage.main.misc.update_scheduler.tooltip" : "Determina qué sistema de actualización se usará. El modo Inteligente actualiza las entidades de bloque según varios factores, como la visibilidad (sin actualizaciones directas) mientras que el modo Rápido las actualiza inmediatamente",
+  "bbe.config.storage.main.misc.update_scheduler.tooltip_notavailable" : "Esta opción no está disponible porque se detectó un mod incompatible",
+
+  "bbe.config.storage.main.misc.update_scheduler.type.fast" : "Rápido",
+  "bbe.config.storage.main.misc.update_scheduler.type.smart" : "Inteligente",
+
+  "bbe.config.storage.main.misc.banner_graphics.type.fast" : "Rápido",
+  "bbe.config.storage.main.misc.banner_graphics.type.fancy" : "Fabuloso",
+
+  "bbe.config.storage.main.misc.shademode.type.sodium" : "Sodium",
+  "bbe.config.storage.main.misc.shademode.type.vanilla" : "Vanilla",
+
+  "bbe.config.storage.main.misc.banner_pose" : "Posición del estandarte",
+  "bbe.config.storage.main.misc.banner_pose.tooltip" : "Rota la tela del estandarte a una posición predeterminada"
+}
